@@ -14,9 +14,13 @@ namespace Proyecto
     {
         private List<PictureBox> Fichas;
         private int[][] Tablero;
+        private List<int> Auxiliar;
+        private const int Profundidad = 1;
         public Form1()
         {
             InitializeComponent();
+
+            Auxiliar = new List<int>();
 
             Tablero = new int[17][];
             for (int i = 0; i < 17; i++)
@@ -55,6 +59,15 @@ namespace Proyecto
                     c2++;
                 }
                 c3 = 0;
+            }
+
+            for(int i = 0; i < 17; i++)
+            {
+                for(int j = 0; j < 9; j++)
+                {
+                    richTextBox1.AppendText(Tablero[i][j].ToString() + " ");
+                }
+                richTextBox1.AppendText(Environment.NewLine);
             }
 
             Fichas = new List<PictureBox>();
@@ -122,6 +135,7 @@ namespace Proyecto
             {
                 Fichas.ElementAt(i).Parent = pictureBox1;
                 Fichas.ElementAt(i).Image = null;
+                Fichas.ElementAt(i).Tag = 0;
             }
 
             Fichas.ElementAt(0).Location = new Point(43, 128);
@@ -203,6 +217,383 @@ namespace Proyecto
             Fichas.ElementAt(25).Image = Proyecto.Properties.Resources.Beedrill;
             Fichas.ElementAt(57).Tag = 2;
             Fichas.ElementAt(57).Image = Proyecto.Properties.Resources.Beedrill;
+
+        }
+
+        private void ObtieneCoordenadas(ref int x, ref int y, int Nodo)
+        {
+            for(int i = 0; i < 17; i++)
+            {
+                for(int j = 0; j < 9; j++)
+                {
+                    if (Tablero[i][j] == Nodo)
+                    {
+                        x = j;
+                        y = i;
+                        return;
+                    }
+                }
+            }
+        }
+
+        private bool MovPosible(int NodoI, int NodoF, string Accion)
+        {
+            int x = 0, y = 0;
+            ObtieneCoordenadas(ref x, ref y, NodoI);
+            if (Accion.CompareTo("clonar") == 0)
+            {
+                if ((x - 1 >= 0 && y - 1 >= 0) && Tablero[y - 1][x - 1] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y - 1][x - 1]).Tag) == 0)//Puedo clonar esquina sup izq
+                    return true;
+                if ((x + 1 < 9 && y - 1 >= 0) && Tablero[y - 1][x + 1] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y - 1][x + 1]).Tag) == 0)//Puedo clonar esquina sup der
+                    return true;
+                if ((x - 1 >= 0 && y + 1 < 17) && Tablero[y + 1][x - 1] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y + 1][x - 1]).Tag) == 0)//Puedo clonar esquina inf izq
+                    return true;
+                if ((x + 1 < 9 && y + 1 < 17) && Tablero[y + 1][x + 1] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y + 1][x + 1]).Tag) == 0)//Puedo clonar esquina inf izq
+                    return true;
+                if (y - 2 >= 0 && Tablero[y - 2][x] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y - 2][x]).Tag) == 0)//Puedo clonar hacia arriba
+                    return true;
+                if (y + 2 < 17 && Tablero[y + 2][x] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y + 2][x]).Tag) == 0)//Puedo clonar hacia arriba
+                    return true;
+            }
+            if (Accion.CompareTo("saltar") == 0)
+            {
+                if ((x - 2 >= 0 && y - 2 >= 0) && Tablero[y - 2][x - 2] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y - 2][x - 2]).Tag) == 0)//Puedo saltar esquina sup izq
+                    return true;
+                if ((x + 2 < 9 && y - 2 >= 0) && Tablero[y - 2][x + 2] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y - 2][x + 2]).Tag) == 0)//Puedo saltar esquina sup der
+                    return true;
+                if ((x - 2 >= 0 && y + 2 < 17) && Tablero[y + 2][x - 2] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y + 2][x - 2]).Tag) == 0)//Puedo saltar esquina inf izq
+                    return true;
+                if ((x + 2 < 9 && y + 2 < 17) && Tablero[y + 2][x + 2] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y + 2][x + 2]).Tag) == 0)//Puedo saltar esquina inf izq
+                    return true;
+                if ((x - 1 >= 0 && y - 2 >= 0) && Tablero[y - 2][x - 1] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y - 2][x - 1]).Tag) == 0)//Puedo saltar esquina sup izq rara
+                    return true;
+                if ((x + 1 < 9 && y - 2 >= 0) && Tablero[y - 2][x + 1] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y - 2][x + 1]).Tag) == 0)//Puedo saltar esquina sup der rara
+                    return true;
+                if ((x - 1 >= 0 && y + 2 < 17) && Tablero[y + 2][x - 1] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y + 2][x - 1]).Tag) == 0)//Puedo saltar esquina inf izq rara
+                    return true;
+                if ((x + 1 < 9 && y + 2 < 17) && Tablero[y + 2][x + 1] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y + 2][x + 1]).Tag) == 0)//Puedo saltar esquina inf izq rara
+                    return true;
+                if (y - 4 >= 0 && Tablero[y - 4][x] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y - 4][x]).Tag) == 0)//Puedo saltar hacia arriba
+                    return true;
+                if (y + 4 < 17 && Tablero[y + 4][x] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y + 4][x]).Tag) == 0)//Puedo saltar hacia arriba
+                    return true;
+                if (x - 2 >= 0 && Tablero[y][x - 2] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y][x - 2]).Tag) == 0)//Puedo saltar hacia izq
+                    return true;
+                if (x + 2 < 17 && Tablero[y][x - 2] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y][x - 2]).Tag) == 0)//Puedo saltar hacia der
+                    return true;
+            }
+            return false;
+        }
+
+        private bool MovPosibleAuxiliar(int NodoI, int NodoF, string Accion)
+        {
+            int x = 0, y = 0;
+            ObtieneCoordenadas(ref x, ref y, NodoI);
+            if (Accion.CompareTo("clonar") == 0)
+            {
+                if ((x - 1 >= 0 && y - 1 >= 0) && Tablero[y - 1][x - 1] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y - 1][x - 1])) == 0)//Puedo clonar esquina sup izq
+                    return true;
+                if ((x + 1 < 9 && y - 1 >= 0) && Tablero[y - 1][x + 1] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y - 1][x + 1])) == 0)//Puedo clonar esquina sup der
+                    return true;
+                if ((x - 1 >= 0 && y + 1 < 17) && Tablero[y + 1][x - 1] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y + 1][x - 1])) == 0)//Puedo clonar esquina inf izq
+                    return true;
+                if ((x + 1 < 9 && y + 1 < 17) && Tablero[y + 1][x + 1] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y + 1][x + 1])) == 0)//Puedo clonar esquina inf izq
+                    return true;
+                if (y - 2 >= 0 && Tablero[y - 2][x] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y - 2][x])) == 0)//Puedo clonar hacia arriba
+                    return true;
+                if (y + 2 < 17 && Tablero[y + 2][x] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y + 2][x])) == 0)//Puedo clonar hacia arriba
+                    return true;
+            }
+            if (Accion.CompareTo("saltar") == 0)
+            {
+                if ((x - 2 >= 0 && y - 2 >= 0) && Tablero[y - 2][x - 2] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y - 2][x - 2])) == 0)//Puedo saltar esquina sup izq
+                    return true;
+                if ((x + 2 < 9 && y - 2 >= 0) && Tablero[y - 2][x + 2] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y - 2][x + 2])) == 0)//Puedo saltar esquina sup der
+                    return true;
+                if ((x - 2 >= 0 && y + 2 < 17) && Tablero[y + 2][x - 2] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y + 2][x - 2])) == 0)//Puedo saltar esquina inf izq
+                    return true;
+                if ((x + 2 < 9 && y + 2 < 17) && Tablero[y + 2][x + 2] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y + 2][x + 2])) == 0)//Puedo saltar esquina inf izq
+                    return true;
+                if ((x - 1 >= 0 && y - 2 >= 0) && Tablero[y - 2][x - 1] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y - 2][x - 1])) == 0)//Puedo saltar esquina sup izq rara
+                    return true;
+                if ((x + 1 < 9 && y - 2 >= 0) && Tablero[y - 2][x + 1] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y - 2][x + 1])) == 0)//Puedo saltar esquina sup der rara
+                    return true;
+                if ((x - 1 >= 0 && y + 2 < 17) && Tablero[y + 2][x - 1] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y + 2][x - 1])) == 0)//Puedo saltar esquina inf izq rara
+                    return true;
+                if ((x + 1 < 9 && y + 2 < 17) && Tablero[y + 2][x + 1] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y + 2][x + 1])) == 0)//Puedo saltar esquina inf izq rara
+                    return true;
+                if (y - 4 >= 0 && Tablero[y - 4][x] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y - 4][x])) == 0)//Puedo saltar hacia arriba
+                    return true;
+                if (y + 4 < 17 && Tablero[y + 4][x] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y + 4][x])) == 0)//Puedo saltar hacia arriba
+                    return true;
+                if (x - 2 >= 0 && Tablero[y][x - 2] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y][x - 2])) == 0)//Puedo saltar hacia izq
+                    return true;
+                if (x + 2 < 17 && Tablero[y][x - 2] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y][x - 2])) == 0)//Puedo saltar hacia der
+                    return true;
+            }
+            return false;
+        }
+
+        private void Pintar()
+        {
+            for(int i = 0; i < Fichas.Count; i++)
+            {
+                if (((int)Fichas.ElementAt(i).Tag) == 1)
+                {
+                    Fichas.ElementAt(i).Image = Proyecto.Properties.Resources.Vespiquen;
+                }
+                if (((int)Fichas.ElementAt(i).Tag) == 2)
+                {
+                    Fichas.ElementAt(i).Image = Proyecto.Properties.Resources.Beedrill;
+                }
+                if (((int)Fichas.ElementAt(i).Tag) == 0)
+                {
+                    Fichas.ElementAt(i).Image = null;
+                }
+            }
+            this.Refresh();
+        }
+
+        private void Mover(int NodoI,int NodoF,string Accion)
+        {
+            if (!MovPosible(NodoI, NodoF, Accion))
+            {
+                MessageBox.Show("Movimiento imposible: " + NodoI.ToString() + "->" + NodoF.ToString() + " " + Accion);
+                return;
+            }
+            int x = 0, y = 0;
+            ObtieneCoordenadas(ref x, ref y, NodoI);
+            if (Accion.CompareTo("clonar") == 0)
+            {
+                if ((x - 1 >= 0 && y - 1 >= 0) && Tablero[y - 1][x - 1] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y - 1][x - 1]).Tag) == 0)//Puedo clonar esquina sup izq
+                    Fichas.ElementAt(Tablero[y - 1][x - 1]).Tag = Fichas.ElementAt(NodoI).Tag;
+                if ((x + 1 < 9 && y - 1 >= 0) && Tablero[y - 1][x + 1] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y - 1][x + 1]).Tag) == 0)//Puedo clonar esquina sup der
+                    Fichas.ElementAt(Tablero[y - 1][x + 1]).Tag = Fichas.ElementAt(NodoI).Tag;
+                if ((x - 1 >= 0 && y + 1 < 17) && Tablero[y + 1][x - 1] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y + 1][x - 1]).Tag) == 0)//Puedo clonar esquina inf izq
+                    Fichas.ElementAt(Tablero[y + 1][x - 1]).Tag = Fichas.ElementAt(NodoI).Tag;
+                if ((x + 1 < 9 && y + 1 < 17) && Tablero[y + 1][x + 1] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y + 1][x + 1]).Tag) == 0)//Puedo clonar esquina inf izq
+                    Fichas.ElementAt(Tablero[y + 1][x + 1]).Tag = Fichas.ElementAt(NodoI).Tag;
+                if (y - 2 >= 0 && Tablero[y - 2][x] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y - 2][x]).Tag) == 0)//Puedo clonar hacia arriba
+                    Fichas.ElementAt(Tablero[y - 2][x]).Tag = Fichas.ElementAt(NodoI).Tag;
+                if (y + 2 < 17 && Tablero[y + 2][x] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y + 2][x]).Tag) == 0)//Puedo clonar hacia arriba
+                    Fichas.ElementAt(Tablero[y + 2][x]).Tag = Fichas.ElementAt(NodoI).Tag;
+            }
+            if (Accion.CompareTo("saltar") == 0)
+            {
+                if ((x - 2 >= 0 && y - 2 >= 0) && Tablero[y - 2][x - 2] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y - 2][x - 2]).Tag) == 0)//Puedo saltar esquina sup izq
+                    Fichas.ElementAt(Tablero[y - 2][x - 2]).Tag = Fichas.ElementAt(NodoI).Tag;
+                if ((x + 2 < 9 && y - 2 >= 0) && Tablero[y - 2][x + 2] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y - 2][x + 2]).Tag) == 0)//Puedo saltar esquina sup der
+                    Fichas.ElementAt(Tablero[y - 2][x + 2]).Tag = Fichas.ElementAt(NodoI).Tag;
+                if ((x - 2 >= 0 && y + 2 < 17) && Tablero[y + 2][x - 2] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y + 2][x - 2]).Tag) == 0)//Puedo saltar esquina inf izq
+                    Fichas.ElementAt(Tablero[y + 2][x - 2]).Tag = Fichas.ElementAt(NodoI).Tag;
+                if ((x + 2 < 9 && y + 2 < 17) && Tablero[y + 2][x + 2] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y + 2][x + 2]).Tag) == 0)//Puedo saltar esquina inf izq
+                    Fichas.ElementAt(Tablero[y + 2][x + 2]).Tag = Fichas.ElementAt(NodoI).Tag;
+                if ((x - 1 >= 0 && y - 2 >= 0) && Tablero[y - 2][x - 1] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y - 2][x - 1]).Tag) == 0)//Puedo saltar esquina sup izq rara
+                    Fichas.ElementAt(Tablero[y - 2][x - 1]).Tag = Fichas.ElementAt(NodoI).Tag;
+                if ((x + 1 < 9 && y - 2 >= 0) && Tablero[y - 2][x + 1] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y - 2][x + 1]).Tag) == 0)//Puedo saltar esquina sup der rara
+                    Fichas.ElementAt(Tablero[y - 2][x + 1]).Tag = Fichas.ElementAt(NodoI).Tag;
+                if ((x - 1 >= 0 && y + 2 < 17) && Tablero[y + 2][x - 1] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y + 2][x - 1]).Tag) == 0)//Puedo saltar esquina inf izq rara
+                    Fichas.ElementAt(Tablero[y + 2][x - 1]).Tag = Fichas.ElementAt(NodoI).Tag;
+                if ((x + 1 < 9 && y + 2 < 17) && Tablero[y + 2][x + 1] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y + 2][x + 1]).Tag) == 0)//Puedo saltar esquina inf der rara
+                    Fichas.ElementAt(Tablero[y + 2][x + 1]).Tag = Fichas.ElementAt(NodoI).Tag;
+                if (y - 4 >= 0 && Tablero[y - 4][x] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y - 4][x]).Tag) == 0)//Puedo saltar hacia arriba doble
+                    Fichas.ElementAt(Tablero[y - 4][x]).Tag = Fichas.ElementAt(NodoI).Tag;
+                if (y + 4 < 17 && Tablero[y + 4][x] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y + 4][x]).Tag) == 0)//Puedo saltar hacia abajo doble
+                    Fichas.ElementAt(Tablero[y + 4][x]).Tag = Fichas.ElementAt(NodoI).Tag;
+                if (x - 2 >= 0 && Tablero[y][x - 2] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y][x - 2]).Tag) == 0)//Puedo saltar hacia izq
+                    Fichas.ElementAt(Tablero[y][x - 2]).Tag = Fichas.ElementAt(NodoI).Tag;
+                if (x + 2 < 17 && Tablero[y][x + 2] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y][x + 2]).Tag) == 0)//Puedo saltar hacia der
+                    Fichas.ElementAt(Tablero[y][x + 2]).Tag = Fichas.ElementAt(NodoI).Tag;
+                Fichas.ElementAt(NodoI).Tag = 0;
+            }
+            Pintar();
+        }
+
+        private int FuncionObjetivo(int Player)
+        {
+            int c = 0;
+            for(int i = 0; i < Auxiliar.Count; i++)
+            {
+                if (Auxiliar.ElementAt(i) == Player)
+                    c++;
+            }
+            return c;
+        }
+
+        private void MoverAuxiliar(int NodoI,int NodoF, string Accion)
+        {
+            if (!MovPosibleAuxiliar(NodoI, NodoF, Accion))
+            {
+                MessageBox.Show("Movimiento imposible del Auxiliar: " + NodoI.ToString() + "->" + NodoF.ToString() + " " + Accion);
+                return;
+            }
+            int x = 0, y = 0;
+            ObtieneCoordenadas(ref x, ref y, NodoI);
+            if (Accion.CompareTo("clonar") == 0)
+            {
+                if ((x - 1 >= 0 && y - 1 >= 0) && Tablero[y - 1][x - 1] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y - 1][x - 1])) == 0)//Puedo clonar esquina sup izq
+                    Auxiliar[Tablero[y - 1][x - 1]] = Auxiliar.ElementAt(NodoI);
+                if ((x + 1 < 9 && y - 1 >= 0) && Tablero[y - 1][x + 1] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y - 1][x + 1])) == 0)//Puedo clonar esquina sup der
+                    Auxiliar[Tablero[y - 1][x + 1]] = Auxiliar.ElementAt(NodoI);
+                if ((x - 1 >= 0 && y + 1 < 17) && Tablero[y + 1][x - 1] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y + 1][x - 1])) == 0)//Puedo clonar esquina inf izq
+                    Auxiliar[Tablero[y + 1][x - 1]] = Auxiliar.ElementAt(NodoI);
+                if ((x + 1 < 9 && y + 1 < 17) && Tablero[y + 1][x + 1] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y + 1][x + 1])) == 0)//Puedo clonar esquina inf izq
+                    Auxiliar[Tablero[y + 1][x + 1]] = Auxiliar.ElementAt(NodoI);
+                if (y - 2 >= 0 && Tablero[y - 2][x] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y - 2][x])) == 0)//Puedo clonar hacia arriba
+                    Auxiliar[Tablero[y - 2][x]] = Auxiliar.ElementAt(NodoI);
+                if (y + 2 < 17 && Tablero[y + 2][x] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y + 2][x])) == 0)//Puedo clonar hacia arriba
+                    Auxiliar[Tablero[y + 2][x]] = Auxiliar.ElementAt(NodoI);
+            }
+            if (Accion.CompareTo("saltar") == 0)
+            {
+                if ((x - 2 >= 0 && y - 2 >= 0) && Tablero[y - 2][x - 2] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y - 2][x - 2])) == 0)//Puedo saltar esquina sup izq
+                    Auxiliar[Tablero[y - 2][x - 2]] = Auxiliar.ElementAt(NodoI);
+                if ((x + 2 < 9 && y - 2 >= 0) && Tablero[y - 2][x + 2] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y - 2][x + 2])) == 0)//Puedo saltar esquina sup der
+                    Auxiliar[Tablero[y - 2][x + 2]] = Auxiliar.ElementAt(NodoI);
+                if ((x - 2 >= 0 && y + 2 < 17) && Tablero[y + 2][x - 2] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y + 2][x - 2])) == 0)//Puedo saltar esquina inf izq
+                    Auxiliar[Tablero[y + 2][x - 2]] = Auxiliar.ElementAt(NodoI);
+                if ((x + 2 < 9 && y + 2 < 17) && Tablero[y + 2][x + 2] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y + 2][x + 2])) == 0)//Puedo saltar esquina inf izq
+                    Auxiliar[Tablero[y + 2][x + 2]] = Auxiliar.ElementAt(NodoI);
+                if ((x - 1 >= 0 && y - 2 >= 0) && Tablero[y - 2][x - 1] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y - 2][x - 1])) == 0)//Puedo saltar esquina sup izq rara
+                    Auxiliar[Tablero[y - 2][x - 1]] = Auxiliar.ElementAt(NodoI);
+                if ((x + 1 < 9 && y - 2 >= 0) && Tablero[y - 2][x + 1] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y - 2][x + 1])) == 0)//Puedo saltar esquina sup der rara
+                    Auxiliar[Tablero[y - 2][x + 1]] = Auxiliar.ElementAt(NodoI);
+                if ((x - 1 >= 0 && y + 2 < 17) && Tablero[y + 2][x - 1] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y + 2][x - 1])) == 0)//Puedo saltar esquina inf izq rara
+                    Auxiliar[Tablero[y + 2][x - 1]] = Auxiliar.ElementAt(NodoI);
+                if ((x + 1 < 9 && y + 2 < 17) && Tablero[y + 2][x + 1] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y + 2][x + 1])) == 0)//Puedo saltar esquina inf der rara
+                    Auxiliar[Tablero[y + 2][x + 1]] = Auxiliar.ElementAt(NodoI);
+                if (y - 4 >= 0 && Tablero[y - 4][x] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y - 4][x])) == 0)//Puedo saltar hacia arriba doble
+                    Auxiliar[Tablero[y - 4][x]] = Auxiliar.ElementAt(NodoI);
+                if (y + 4 < 17 && Tablero[y + 4][x] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y + 4][x])) == 0)//Puedo saltar hacia abajo doble
+                    Auxiliar[Tablero[y + 4][x]] = Auxiliar.ElementAt(NodoI);
+                if (x - 2 >= 0 && Tablero[y][x - 2] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y][x - 2])) == 0)//Puedo saltar hacia izq
+                    Auxiliar[Tablero[y][x - 2]] = Auxiliar.ElementAt(NodoI);
+                if (x + 2 < 17 && Tablero[y][x + 2] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y][x + 2])) == 0)//Puedo saltar hacia der
+                    Auxiliar[Tablero[y ][x + 2]] = Auxiliar.ElementAt(NodoI);
+                Auxiliar[NodoI] = 0;
+            }
+        }
+
+        private int MaximizaEnemigo(int Player,int Nivel = 0)
+        {
+            if (Player == 1)
+            {
+                for(int i = 0; i < Auxiliar.Count; i++)
+                {
+                    if (Auxiliar.ElementAt(i) == 2)
+                    {
+
+                    }
+                }
+            }
+            return 0;
+        }
+
+        private int Maximiza(int NodoI, ref int NodoF, int Player)
+        {
+            int a = 0, x = 0, y = 0, Mayor = -999, b = 0;
+            List<int> Copia = new List<int>();
+            ObtieneCoordenadas(ref x, ref y, NodoI);
+            Auxiliar = new List<int>();
+            for (int i = 0; i < Fichas.Count; i++)
+            {
+                Auxiliar.Add(((int)Fichas.ElementAt(i).Tag));
+            }
+
+            Copia = new List<int>();
+            for(int i = 0; i < Auxiliar.Count; i++)
+            {
+                Copia.Add(Auxiliar.ElementAt(i));
+            }
+            if ((x - 1 >= 0 && y - 1 >= 0) && Auxiliar.ElementAt(Tablero[y - 1][x - 1]) == 0)//Me puedo clonar esq sup izq
+            {
+                MoverAuxiliar(NodoI, Tablero[y - 1][x - 1], "clonar");
+                a = FuncionObjetivo(Player);
+                b = MaximizaEnemigo(Player);
+                if ((a - b) > Mayor)
+                {
+                    Mayor = a - b;
+                    NodoF = Tablero[y - 1][x - 1];
+                }
+                Auxiliar = new List<int>();
+                for (int i = 0; i < Copia.Count; i++)
+                {
+                    Auxiliar.Add(Copia.ElementAt(i));
+                }
+            }
+            return Mayor;
         }
     }
 }
