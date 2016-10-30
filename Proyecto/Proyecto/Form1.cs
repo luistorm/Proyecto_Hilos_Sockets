@@ -390,6 +390,54 @@ namespace Proyecto
             this.Refresh();
         }
 
+        private void Multiplicar(int Nodo)
+        {
+            int x = 0, y = 0;
+            ObtieneCoordenadas(ref x, ref y, Nodo);
+            if ((x - 1 >= 0 && y - 1 >= 0) && Tablero[y - 1][x - 1] != -1
+                    && ((int)Fichas.ElementAt(Tablero[y - 1][x - 1]).Tag) != 0)//Puedo clonar esquina sup izq
+                Fichas.ElementAt(Tablero[y - 1][x - 1]).Tag = Fichas.ElementAt(Nodo).Tag;
+            if ((x + 1 < 9 && y - 1 >= 0) && Tablero[y - 1][x + 1] != -1
+                && ((int)Fichas.ElementAt(Tablero[y - 1][x + 1]).Tag) != 0)//Puedo clonar esquina sup der
+                Fichas.ElementAt(Tablero[y - 1][x + 1]).Tag = Fichas.ElementAt(Nodo).Tag;
+            if ((x - 1 >= 0 && y + 1 < 17) && Tablero[y + 1][x - 1] != -1
+                && ((int)Fichas.ElementAt(Tablero[y + 1][x - 1]).Tag) != 0)//Puedo clonar esquina inf izq
+                Fichas.ElementAt(Tablero[y + 1][x - 1]).Tag = Fichas.ElementAt(Nodo).Tag;
+            if ((x + 1 < 9 && y + 1 < 17) && Tablero[y + 1][x + 1] != -1
+                && ((int)Fichas.ElementAt(Tablero[y + 1][x + 1]).Tag) != 0)//Puedo clonar esquina inf izq
+                Fichas.ElementAt(Tablero[y + 1][x + 1]).Tag = Fichas.ElementAt(Nodo).Tag;
+            if (y - 2 >= 0 && Tablero[y - 2][x] != -1
+                && ((int)Fichas.ElementAt(Tablero[y - 2][x]).Tag) != 0)//Puedo clonar hacia arriba
+                Fichas.ElementAt(Tablero[y - 2][x]).Tag = Fichas.ElementAt(Nodo).Tag;
+            if (y + 2 < 17 && Tablero[y + 2][x] != -1
+                && ((int)Fichas.ElementAt(Tablero[y + 2][x]).Tag) != 0)//Puedo clonar hacia arriba
+                Fichas.ElementAt(Tablero[y + 2][x]).Tag = Fichas.ElementAt(Nodo).Tag;
+        }
+
+        private void MultiplicarAuxiliar(int Nodo)
+        {
+            int x = 0, y = 0;
+            ObtieneCoordenadas(ref x, ref y, Nodo);
+            if ((x - 1 >= 0 && y - 1 >= 0) && Tablero[y - 1][x - 1] != -1
+                    && (Auxiliar.ElementAt(Tablero[y - 1][x - 1])) != 0)//Puedo clonar esquina sup izq
+                Auxiliar[Tablero[y - 1][x - 1]] = Auxiliar.ElementAt(Nodo);
+            if ((x + 1 < 9 && y - 1 >= 0) && Tablero[y - 1][x + 1] != -1
+                && (Auxiliar.ElementAt(Tablero[y - 1][x + 1])) != 0)//Puedo clonar esquina sup der
+                Auxiliar[Tablero[y - 1][x + 1]] = Auxiliar.ElementAt(Nodo);
+            if ((x - 1 >= 0 && y + 1 < 17) && Tablero[y + 1][x - 1] != -1
+                && (Auxiliar.ElementAt(Tablero[y + 1][x - 1])) != 0)//Puedo clonar esquina inf izq
+                Auxiliar[Tablero[y + 1][x - 1]] = Auxiliar.ElementAt(Nodo);
+            if ((x + 1 < 9 && y + 1 < 17) && Tablero[y + 1][x + 1] != -1
+                && (Auxiliar.ElementAt(Tablero[y + 1][x + 1])) != 0)//Puedo clonar esquina inf izq
+                Auxiliar[Tablero[y + 1][x + 1]] = Auxiliar.ElementAt(Nodo);
+            if (y - 2 >= 0 && Tablero[y - 2][x] != -1
+                && (Auxiliar.ElementAt(Tablero[y - 2][x])) != 0)//Puedo clonar hacia arriba
+                Auxiliar[Tablero[y - 2][x]] = Auxiliar.ElementAt(Nodo);
+            if (y + 2 < 17 && Tablero[y + 2][x] != -1
+                && (Auxiliar.ElementAt(Tablero[y + 2][x])) != 0)//Puedo clonar hacia arriba
+                Auxiliar[Tablero[y + 2][x]] = Auxiliar.ElementAt(Nodo);
+        }
+
         private void Mover(int NodoI,int NodoF,string Accion)
         {
             if (!MovPosible(NodoI, NodoF, Accion))
@@ -460,6 +508,7 @@ namespace Proyecto
                     Fichas.ElementAt(Tablero[y][x + 2]).Tag = Fichas.ElementAt(NodoI).Tag;
                 Fichas.ElementAt(NodoI).Tag = 0;
             }
+            Multiplicar(NodoF);
             Pintar();
         }
 
@@ -544,24 +593,938 @@ namespace Proyecto
                     Auxiliar[Tablero[y ][x + 2]] = Auxiliar.ElementAt(NodoI);
                 Auxiliar[NodoI] = 0;
             }
+            MultiplicarAuxiliar(NodoF);
         }
 
         private int MaximizaEnemigo(int Player,int Nivel = 0)
         {
+            List<int> Copia;
+            int x = 0, y = 0, Mayor = -999;
+            int b = 0;
             if (Player == 1)
             {
                 for(int i = 0; i < Auxiliar.Count; i++)
                 {
                     if (Auxiliar.ElementAt(i) == 2)
                     {
-
+                        ObtieneCoordenadas(ref x, ref y, i);
+                        Copia = new List<int>();
+                        for (int j = 0; j < Auxiliar.Count; j++)
+                        {
+                            Copia.Add(Auxiliar.ElementAt(j));
+                        }
+                        if ((x - 1 >= 0 && y - 1 >= 0) && Tablero[y - 1][x - 1] != -1
+                            && Auxiliar.ElementAt(Tablero[y - 1][x - 1]) == 0)//El enemigo puede ir a la esquina sup izquierda
+                        {
+                            MoverAuxiliar(i, Tablero[y - 1][x - 1], "clonar");
+                            if (Nivel < Profundidad)
+                            {
+                                b = b - MaximizaEnemigo(2, Nivel + 1);
+                            }
+                            else
+                                b = FuncionObjetivo(2);
+                            if (b > Mayor)
+                            {
+                                Mayor = b;
+                            }
+                            Auxiliar = new List<int>();
+                            for (int j = 0; j < Copia.Count; j++)
+                            {
+                                Auxiliar.Add(Copia.ElementAt(j));
+                            }
+                        }
+                        Copia = new List<int>();
+                        for (int j = 0; j < Auxiliar.Count; j++)
+                        {
+                            Copia.Add(Auxiliar.ElementAt(j));
+                        }
+                        if ((x + 1 < 9 && y - 1 >= 0) && Tablero[y - 1][x + 1] != -1
+                            && Auxiliar.ElementAt(Tablero[y - 1][x + 1]) == 0)//El enemigo puede ir a la esquina sup der
+                        {
+                            MoverAuxiliar(i, Tablero[y - 1][x + 1], "clonar");
+                            if (Nivel < Profundidad)
+                            {
+                                b = b - MaximizaEnemigo(2, Nivel + 1);
+                            }
+                            else
+                                b = FuncionObjetivo(2);
+                            if (b > Mayor)
+                            {
+                                Mayor = b;
+                            }
+                            Auxiliar = new List<int>();
+                            for (int j = 0; j < Copia.Count; j++)
+                            {
+                                Auxiliar.Add(Copia.ElementAt(j));
+                            }
+                        }
+                        Copia = new List<int>();
+                        for (int j = 0; j < Auxiliar.Count; j++)
+                        {
+                            Copia.Add(Auxiliar.ElementAt(j));
+                        }
+                        if ((x - 1 >= 0 && y + 1 < 17) && Tablero[y + 1][x - 1] != -1
+                            && Auxiliar.ElementAt(Tablero[y + 1][x - 1]) == 0)//El enemigo puede ir a la esquina inf izquierda
+                        {
+                            MoverAuxiliar(i, Tablero[y + 1][x - 1], "clonar");
+                            if (Nivel < Profundidad)
+                            {
+                                b = b - MaximizaEnemigo(2, Nivel + 1);
+                            }
+                            else
+                                b = FuncionObjetivo(2);
+                            if (b > Mayor)
+                            {
+                                Mayor = b;
+                            }
+                            Auxiliar = new List<int>();
+                            for (int j = 0; j < Copia.Count; j++)
+                            {
+                                Auxiliar.Add(Copia.ElementAt(j));
+                            }
+                        }
+                        Copia = new List<int>();
+                        for (int j = 0; j < Auxiliar.Count; j++)
+                        {
+                            Copia.Add(Auxiliar.ElementAt(j));
+                        }
+                        if ((x + 1 < 9 && y + 1 < 17) && Tablero[y + 1][x + 1] != -1
+                            && Auxiliar.ElementAt(Tablero[y + 1][x - 1]) == 0)//El enemigo puede ir a la esquina inf der
+                        {
+                            MoverAuxiliar(i, Tablero[y + 1][x + 1], "clonar");
+                            if (Nivel < Profundidad)
+                            {
+                                b = b - MaximizaEnemigo(2, Nivel + 1);
+                            }
+                            else
+                                b = FuncionObjetivo(2);
+                            if (b > Mayor)
+                            {
+                                Mayor = b;
+                            }
+                            Auxiliar = new List<int>();
+                            for (int j = 0; j < Copia.Count; j++)
+                            {
+                                Auxiliar.Add(Copia.ElementAt(j));
+                            }
+                        }
+                        Copia = new List<int>();
+                        for (int j = 0; j < Auxiliar.Count; j++)
+                        {
+                            Copia.Add(Auxiliar.ElementAt(j));
+                        }
+                        if (y - 2 >= 0 && Tablero[y - 2][x] != -1
+                            && Auxiliar.ElementAt(Tablero[y - 2][x]) == 0)//El enemigo puede ir arriba
+                        {
+                            MoverAuxiliar(i, Tablero[y - 2][x], "clonar");
+                            if (Nivel < Profundidad)
+                            {
+                                b = b - MaximizaEnemigo(2, Nivel + 1);
+                            }
+                            else
+                                b = FuncionObjetivo(2);
+                            if (b > Mayor)
+                            {
+                                Mayor = b;
+                            }
+                            Auxiliar = new List<int>();
+                            for (int j = 0; j < Copia.Count; j++)
+                            {
+                                Auxiliar.Add(Copia.ElementAt(j));
+                            }
+                        }
+                        Copia = new List<int>();
+                        for (int j = 0; j < Auxiliar.Count; j++)
+                        {
+                            Copia.Add(Auxiliar.ElementAt(j));
+                        }
+                        if (y + 2 < 17 && Tablero[y + 2][x] != -1
+                            && Auxiliar.ElementAt(Tablero[y + 2][x]) == 0)//El enemigo puede ir abajo
+                        {
+                            MoverAuxiliar(i, Tablero[y + 2][x], "clonar");
+                            if (Nivel < Profundidad)
+                            {
+                                b = b - MaximizaEnemigo(2, Nivel + 1);
+                            }
+                            else
+                                b = FuncionObjetivo(2);
+                            if (b > Mayor)
+                            {
+                                Mayor = b;
+                            }
+                            Auxiliar = new List<int>();
+                            for (int j = 0; j < Copia.Count; j++)
+                            {
+                                Auxiliar.Add(Copia.ElementAt(j));
+                            }
+                        }
+                        Copia = new List<int>();
+                        for (int j = 0; j < Auxiliar.Count; j++)
+                        {
+                            Copia.Add(Auxiliar.ElementAt(j));
+                        }
+                        if (x + 2 < 9 && Tablero[y][x + 2] != -1
+                            && Auxiliar.ElementAt(Tablero[y][x + 2]) == 0)//El enemigo puede ir derecha
+                        {
+                            MoverAuxiliar(i, Tablero[y][x + 2], "saltar");
+                            if (Nivel < Profundidad)
+                            {
+                                b = b - MaximizaEnemigo(2, Nivel + 1);
+                            }
+                            else
+                                b = FuncionObjetivo(2);
+                            if (b > Mayor)
+                            {
+                                Mayor = b;
+                            }
+                            Auxiliar = new List<int>();
+                            for (int j = 0; j < Copia.Count; j++)
+                            {
+                                Auxiliar.Add(Copia.ElementAt(j));
+                            }
+                        }
+                        Copia = new List<int>();
+                        for (int j = 0; j < Auxiliar.Count; j++)
+                        {
+                            Copia.Add(Auxiliar.ElementAt(j));
+                        }
+                        if (x - 2 >= 0 && Tablero[y][x - 2] != -1
+                            && Auxiliar.ElementAt(Tablero[y][x - 2]) == 0)//El enemigo puede ir izq
+                        {
+                            MoverAuxiliar(i, Tablero[y][x - 2], "saltar");
+                            if (Nivel < Profundidad)
+                            {
+                                b = b - MaximizaEnemigo(2, Nivel + 1);
+                            }
+                            else
+                                b = FuncionObjetivo(2);
+                            if (b > Mayor)
+                            {
+                                Mayor = b;
+                            }
+                            Auxiliar = new List<int>();
+                            for (int j = 0; j < Copia.Count; j++)
+                            {
+                                Auxiliar.Add(Copia.ElementAt(j));
+                            }
+                        }
+                        Copia = new List<int>();
+                        for (int j = 0; j < Auxiliar.Count; j++)
+                        {
+                            Copia.Add(Auxiliar.ElementAt(j));
+                        }
+                        if (y + 4 < 17 && Tablero[y + 4][x] != -1
+                            && Auxiliar.ElementAt(Tablero[y + 4][x]) == 0)//El enemigo puede ir abajo doble
+                        {
+                            MoverAuxiliar(i, Tablero[y + 4][x], "saltar");
+                            if (Nivel < Profundidad)
+                            {
+                                b = b - MaximizaEnemigo(2, Nivel + 1);
+                            }
+                            else
+                                b = FuncionObjetivo(2);
+                            if (b > Mayor)
+                            {
+                                Mayor = b;
+                            }
+                            Auxiliar = new List<int>();
+                            for (int j = 0; j < Copia.Count; j++)
+                            {
+                                Auxiliar.Add(Copia.ElementAt(j));
+                            }
+                        }
+                        Copia = new List<int>();
+                        for (int j = 0; j < Auxiliar.Count; j++)
+                        {
+                            Copia.Add(Auxiliar.ElementAt(j));
+                        }
+                        if (y - 4 >= 0 && Tablero[y - 4][x] != -1
+                            && Auxiliar.ElementAt(Tablero[y - 4][x]) == 0)//El enemigo puede ir arriba doble
+                        {
+                            MoverAuxiliar(i, Tablero[y - 4][x], "saltar");
+                            if (Nivel < Profundidad)
+                            {
+                                b = b - MaximizaEnemigo(2, Nivel + 1);
+                            }
+                            else
+                                b = FuncionObjetivo(2);
+                            if (b > Mayor)
+                            {
+                                Mayor = b;
+                            }
+                            Auxiliar = new List<int>();
+                            for (int j = 0; j < Copia.Count; j++)
+                            {
+                                Auxiliar.Add(Copia.ElementAt(j));
+                            }
+                        }
+                        Copia = new List<int>();
+                        for (int j = 0; j < Auxiliar.Count; j++)
+                        {
+                            Copia.Add(Auxiliar.ElementAt(j));
+                        }
+                        if ((x - 2 >= 0 && y - 2 >= 0) && Tablero[y - 2][x - 2] != -1
+                            && Auxiliar.ElementAt(Tablero[y - 2][x - 2]) == 0)//El enemigo puede ir a la esquina sup izq doble
+                        {
+                            MoverAuxiliar(i, Tablero[y - 2][x - 2], "saltar");
+                            if (Nivel < Profundidad)
+                            {
+                                b = b - MaximizaEnemigo(2, Nivel + 1);
+                            }
+                            else
+                                b = FuncionObjetivo(2);
+                            if (b > Mayor)
+                            {
+                                Mayor = b;
+                            }
+                            Auxiliar = new List<int>();
+                            for (int j = 0; j < Copia.Count; j++)
+                            {
+                                Auxiliar.Add(Copia.ElementAt(j));
+                            }
+                        }
+                        Copia = new List<int>();
+                        for (int j = 0; j < Auxiliar.Count; j++)
+                        {
+                            Copia.Add(Auxiliar.ElementAt(j));
+                        }
+                        if ((x + 2 < 9 && y - 2 >= 0) && Tablero[y - 2][x + 2] != -1
+                            && Auxiliar.ElementAt(Tablero[y - 2][x + 2]) == 0)//El enemigo puede ir a la esquina sup der doble
+                        {
+                            MoverAuxiliar(i, Tablero[y - 2][x + 2], "clonar");
+                            if (Nivel < Profundidad)
+                            {
+                                b = b - MaximizaEnemigo(2, Nivel + 1);
+                            }
+                            else
+                                b = FuncionObjetivo(2);
+                            if (b > Mayor)
+                            {
+                                Mayor = b;
+                            }
+                            Auxiliar = new List<int>();
+                            for (int j = 0; j < Copia.Count; j++)
+                            {
+                                Auxiliar.Add(Copia.ElementAt(j));
+                            }
+                        }
+                        Copia = new List<int>();
+                        for (int j = 0; j < Auxiliar.Count; j++)
+                        {
+                            Copia.Add(Auxiliar.ElementAt(j));
+                        }
+                        if ((x - 2 >= 0 && y + 2 < 17) && Tablero[y + 2][x - 2] != -1
+                            && Auxiliar.ElementAt(Tablero[y + 2][x - 2]) == 0)//El enemigo puede ir a la esquina inf izq dob
+                        {
+                            MoverAuxiliar(i, Tablero[y + 2][x - 2], "clonar");
+                            if (Nivel < Profundidad)
+                            {
+                                b = b - MaximizaEnemigo(2, Nivel + 1);
+                            }
+                            else
+                                b = FuncionObjetivo(2);
+                            if (b > Mayor)
+                            {
+                                Mayor = b;
+                            }
+                            Auxiliar = new List<int>();
+                            for (int j = 0; j < Copia.Count; j++)
+                            {
+                                Auxiliar.Add(Copia.ElementAt(j));
+                            }
+                        }
+                        Copia = new List<int>();
+                        for (int j = 0; j < Auxiliar.Count; j++)
+                        {
+                            Copia.Add(Auxiliar.ElementAt(j));
+                        }
+                        if ((x + 2 < 9 && y + 2 < 17) && Tablero[y + 2][x + 2] != -1
+                            && Auxiliar.ElementAt(Tablero[y + 2][x + 2]) == 0)//El enemigo puede ir a la esquina inf der dob
+                        {
+                            MoverAuxiliar(i, Tablero[y + 2][x + 2], "clonar");
+                            if (Nivel < Profundidad)
+                            {
+                                b = b - MaximizaEnemigo(2, Nivel + 1);
+                            }
+                            else
+                                b = FuncionObjetivo(2);
+                            if (b > Mayor)
+                            {
+                                Mayor = b;
+                            }
+                            Auxiliar = new List<int>();
+                            for (int j = 0; j < Copia.Count; j++)
+                            {
+                                Auxiliar.Add(Copia.ElementAt(j));
+                            }
+                        }
+                        Copia = new List<int>();
+                        for (int j = 0; j < Auxiliar.Count; j++)
+                        {
+                            Copia.Add(Auxiliar.ElementAt(j));
+                        }
+                        if ((x - 1 >= 0 && y - 2 >= 0) && Tablero[y - 2][x - 1] != -1
+                            && Auxiliar.ElementAt(Tablero[y - 2][x - 1]) == 0)//El enemigo puede ir a la esquina sup izq rara
+                        {
+                            MoverAuxiliar(i, Tablero[y - 2][x - 1], "saltar");
+                            if (Nivel < Profundidad)
+                            {
+                                b = b - MaximizaEnemigo(2, Nivel + 1);
+                            }
+                            else
+                                b = FuncionObjetivo(2);
+                            if (b > Mayor)
+                            {
+                                Mayor = b;
+                            }
+                            Auxiliar = new List<int>();
+                            for (int j = 0; j < Copia.Count; j++)
+                            {
+                                Auxiliar.Add(Copia.ElementAt(j));
+                            }
+                        }
+                        Copia = new List<int>();
+                        for (int j = 0; j < Auxiliar.Count; j++)
+                        {
+                            Copia.Add(Auxiliar.ElementAt(j));
+                        }
+                        if ((x + 1 < 9 && y - 2 >= 0) && Tablero[y - 2][x + 1] != -1
+                            && Auxiliar.ElementAt(Tablero[y - 2][x + 1]) == 0)//El enemigo puede ir a la esquina sup der rara
+                        {
+                            MoverAuxiliar(i, Tablero[y - 2][x + 1], "saltar");
+                            if (Nivel < Profundidad)
+                            {
+                                b = b - MaximizaEnemigo(2, Nivel + 1);
+                            }
+                            else
+                                b = FuncionObjetivo(2);
+                            if (b > Mayor)
+                            {
+                                Mayor = b;
+                            }
+                            Auxiliar = new List<int>();
+                            for (int j = 0; j < Copia.Count; j++)
+                            {
+                                Auxiliar.Add(Copia.ElementAt(j));
+                            }
+                        }
+                        Copia = new List<int>();
+                        for (int j = 0; j < Auxiliar.Count; j++)
+                        {
+                            Copia.Add(Auxiliar.ElementAt(j));
+                        }
+                        if ((x - 1 >= 0 && y + 2 < 17) && Tablero[y + 2][x - 1] != -1
+                            && Auxiliar.ElementAt(Tablero[y + 2][x - 1]) == 0)//El enemigo puede ir a la esquina inf izq rara
+                        {
+                            MoverAuxiliar(i, Tablero[y + 2][x - 1], "saltar");
+                            if (Nivel < Profundidad)
+                            {
+                                b = b - MaximizaEnemigo(2, Nivel + 1);
+                            }
+                            else
+                                b = FuncionObjetivo(2);
+                            if (b > Mayor)
+                            {
+                                Mayor = b;
+                            }
+                            Auxiliar = new List<int>();
+                            for (int j = 0; j < Copia.Count; j++)
+                            {
+                                Auxiliar.Add(Copia.ElementAt(j));
+                            }
+                        }
+                        Copia = new List<int>();
+                        for (int j = 0; j < Auxiliar.Count; j++)
+                        {
+                            Copia.Add(Auxiliar.ElementAt(j));
+                        }
+                        if ((x + 1 < 9 && y + 2 < 17) && Tablero[y + 2][x + 1] != -1
+                            && Auxiliar.ElementAt(Tablero[y + 2][x + 1]) == 0)//El enemigo puede ir a la esquina inf der rara
+                        {
+                            MoverAuxiliar(i, Tablero[y + 2][x + 1], "saltar");
+                            if (Nivel < Profundidad)
+                            {
+                                b = b - MaximizaEnemigo(2, Nivel + 1);
+                            }
+                            else
+                                b = FuncionObjetivo(2);
+                            if (b > Mayor)
+                            {
+                                Mayor = b;
+                            }
+                            Auxiliar = new List<int>();
+                            for (int j = 0; j < Copia.Count; j++)
+                            {
+                                Auxiliar.Add(Copia.ElementAt(j));
+                            }
+                        }
                     }
                 }
             }
-            return 0;
+            else
+            {
+                for (int i = 0; i < Auxiliar.Count; i++)
+                {
+                    if (Auxiliar.ElementAt(i) == 1)
+                    {
+                        ObtieneCoordenadas(ref x, ref y, i);
+                        Copia = new List<int>();
+                        for (int j = 0; j < Auxiliar.Count; j++)
+                        {
+                            Copia.Add(Auxiliar.ElementAt(j));
+                        }
+                        if ((x - 1 >= 0 && y - 1 >= 0) && Tablero[y - 1][x - 1] != -1
+                            && Auxiliar.ElementAt(Tablero[y - 1][x - 1]) == 0)//El enemigo puede ir a la esquina sup izquierda
+                        {
+                            MoverAuxiliar(i, Tablero[y - 1][x - 1], "clonar");
+                            if (Nivel < Profundidad)
+                            {
+                                b = b - MaximizaEnemigo(1, Nivel + 1);
+                            }
+                            else
+                                b = FuncionObjetivo(2);
+                            if (b > Mayor)
+                            {
+                                Mayor = b;
+                            }
+                            Auxiliar = new List<int>();
+                            for (int j = 0; j < Copia.Count; j++)
+                            {
+                                Auxiliar.Add(Copia.ElementAt(j));
+                            }
+                        }
+                        Copia = new List<int>();
+                        for (int j = 0; j < Auxiliar.Count; j++)
+                        {
+                            Copia.Add(Auxiliar.ElementAt(j));
+                        }
+                        if ((x + 1 < 9 && y - 1 >= 0) && Tablero[y - 1][x + 1] != -1
+                            && Auxiliar.ElementAt(Tablero[y - 1][x + 1]) == 0)//El enemigo puede ir a la esquina sup der
+                        {
+                            MoverAuxiliar(i, Tablero[y - 1][x + 1], "clonar");
+                            if (Nivel < Profundidad)
+                            {
+                                b = b - MaximizaEnemigo(1, Nivel + 1);
+                            }
+                            else
+                                b = FuncionObjetivo(2);
+                            if (b > Mayor)
+                            {
+                                Mayor = b;
+                            }
+                            Auxiliar = new List<int>();
+                            for (int j = 0; j < Copia.Count; j++)
+                            {
+                                Auxiliar.Add(Copia.ElementAt(j));
+                            }
+                        }
+                        Copia = new List<int>();
+                        for (int j = 0; j < Auxiliar.Count; j++)
+                        {
+                            Copia.Add(Auxiliar.ElementAt(j));
+                        }
+                        if ((x - 1 >= 0 && y + 1 < 17) && Tablero[y + 1][x - 1] != -1
+                            && Auxiliar.ElementAt(Tablero[y + 1][x - 1]) == 0)//El enemigo puede ir a la esquina inf izquierda
+                        {
+                            MoverAuxiliar(i, Tablero[y + 1][x - 1], "clonar");
+                            if (Nivel < Profundidad)
+                            {
+                                b = b - MaximizaEnemigo(1, Nivel + 1);
+                            }
+                            else
+                                b = FuncionObjetivo(2);
+                            if (b > Mayor)
+                            {
+                                Mayor = b;
+                            }
+                            Auxiliar = new List<int>();
+                            for (int j = 0; j < Copia.Count; j++)
+                            {
+                                Auxiliar.Add(Copia.ElementAt(j));
+                            }
+                        }
+                        Copia = new List<int>();
+                        for (int j = 0; j < Auxiliar.Count; j++)
+                        {
+                            Copia.Add(Auxiliar.ElementAt(j));
+                        }
+                        if ((x + 1 < 9 && y + 1 < 17) && Tablero[y + 1][x + 1] != -1
+                            && Auxiliar.ElementAt(Tablero[y + 1][x - 1]) == 0)//El enemigo puede ir a la esquina inf der
+                        {
+                            MoverAuxiliar(i, Tablero[y + 1][x + 1], "clonar");
+                            if (Nivel < Profundidad)
+                            {
+                                b = b - MaximizaEnemigo(1, Nivel + 1);
+                            }
+                            else
+                                b = FuncionObjetivo(2);
+                            if (b > Mayor)
+                            {
+                                Mayor = b;
+                            }
+                            Auxiliar = new List<int>();
+                            for (int j = 0; j < Copia.Count; j++)
+                            {
+                                Auxiliar.Add(Copia.ElementAt(j));
+                            }
+                        }
+                        Copia = new List<int>();
+                        for (int j = 0; j < Auxiliar.Count; j++)
+                        {
+                            Copia.Add(Auxiliar.ElementAt(j));
+                        }
+                        if (y - 2 >= 0 && Tablero[y - 2][x] != -1 
+                            && Auxiliar.ElementAt(Tablero[y - 2][x]) == 0)//El enemigo puede ir arriba
+                        {
+                            MoverAuxiliar(i, Tablero[y - 2][x], "clonar");
+                            if (Nivel < Profundidad)
+                            {
+                                b = b - MaximizaEnemigo(1, Nivel + 1);
+                            }
+                            else
+                                b = FuncionObjetivo(2);
+                            if (b > Mayor)
+                            {
+                                Mayor = b;
+                            }
+                            Auxiliar = new List<int>();
+                            for (int j = 0; j < Copia.Count; j++)
+                            {
+                                Auxiliar.Add(Copia.ElementAt(j));
+                            }
+                        }
+                        Copia = new List<int>();
+                        for (int j = 0; j < Auxiliar.Count; j++)
+                        {
+                            Copia.Add(Auxiliar.ElementAt(j));
+                        }
+                        if (y + 2 < 17 && Tablero[y + 2][x] != -1
+                            && Auxiliar.ElementAt(Tablero[y + 2][x]) == 0)//El enemigo puede ir abajo
+                        {
+                            MoverAuxiliar(i, Tablero[y + 2][x], "clonar");
+                            if (Nivel < Profundidad)
+                            {
+                                b = b - MaximizaEnemigo(1, Nivel + 1);
+                            }
+                            else
+                                b = FuncionObjetivo(2);
+                            if (b > Mayor)
+                            {
+                                Mayor = b;
+                            }
+                            Auxiliar = new List<int>();
+                            for (int j = 0; j < Copia.Count; j++)
+                            {
+                                Auxiliar.Add(Copia.ElementAt(j));
+                            }
+                        }
+                        Copia = new List<int>();
+                        for (int j = 0; j < Auxiliar.Count; j++)
+                        {
+                            Copia.Add(Auxiliar.ElementAt(j));
+                        }
+                        if (x + 2 < 9 && Tablero[y][x + 2] != -1
+                            && Auxiliar.ElementAt(Tablero[y][x + 2]) == 0)//El enemigo puede ir derecha
+                        {
+                            MoverAuxiliar(i, Tablero[y][x + 2], "saltar");
+                            if (Nivel < Profundidad)
+                            {
+                                b = b - MaximizaEnemigo(1, Nivel + 1);
+                            }
+                            else
+                                b = FuncionObjetivo(2);
+                            if (b > Mayor)
+                            {
+                                Mayor = b;
+                            }
+                            Auxiliar = new List<int>();
+                            for (int j = 0; j < Copia.Count; j++)
+                            {
+                                Auxiliar.Add(Copia.ElementAt(j));
+                            }
+                        }
+                        Copia = new List<int>();
+                        for (int j = 0; j < Auxiliar.Count; j++)
+                        {
+                            Copia.Add(Auxiliar.ElementAt(j));
+                        }
+                        if (x - 2 >= 0 && Tablero[y][x - 2] != -1
+                            && Auxiliar.ElementAt(Tablero[y][x - 2]) == 0)//El enemigo puede ir izq
+                        {
+                            MoverAuxiliar(i, Tablero[y][x - 2], "saltar");
+                            if (Nivel < Profundidad)
+                            {
+                                b = b - MaximizaEnemigo(1, Nivel + 1);
+                            }
+                            else
+                                b = FuncionObjetivo(2);
+                            if (b > Mayor)
+                            {
+                                Mayor = b;
+                            }
+                            Auxiliar = new List<int>();
+                            for (int j = 0; j < Copia.Count; j++)
+                            {
+                                Auxiliar.Add(Copia.ElementAt(j));
+                            }
+                        }
+                        Copia = new List<int>();
+                        for (int j = 0; j < Auxiliar.Count; j++)
+                        {
+                            Copia.Add(Auxiliar.ElementAt(j));
+                        }
+                        if (y + 4 < 17 && Tablero[y + 4][x] != -1
+                            && Auxiliar.ElementAt(Tablero[y + 4][x]) == 0)//El enemigo puede ir abajo doble
+                        {
+                            MoverAuxiliar(i, Tablero[y + 4][x], "saltar");
+                            if (Nivel < Profundidad)
+                            {
+                                b = b - MaximizaEnemigo(1, Nivel + 1);
+                            }
+                            else
+                                b = FuncionObjetivo(2);
+                            if (b > Mayor)
+                            {
+                                Mayor = b;
+                            }
+                            Auxiliar = new List<int>();
+                            for (int j = 0; j < Copia.Count; j++)
+                            {
+                                Auxiliar.Add(Copia.ElementAt(j));
+                            }
+                        }
+                        Copia = new List<int>();
+                        for (int j = 0; j < Auxiliar.Count; j++)
+                        {
+                            Copia.Add(Auxiliar.ElementAt(j));
+                        }
+                        if (y - 4 >= 0 && Tablero[y - 4][x] != -1
+                            && Auxiliar.ElementAt(Tablero[y - 4][x]) == 0)//El enemigo puede ir arriba doble
+                        {
+                            MoverAuxiliar(i, Tablero[y - 4][x], "saltar");
+                            if (Nivel < Profundidad)
+                            {
+                                b = b - MaximizaEnemigo(1, Nivel + 1);
+                            }
+                            else
+                                b = FuncionObjetivo(2);
+                            if (b > Mayor)
+                            {
+                                Mayor = b;
+                            }
+                            Auxiliar = new List<int>();
+                            for (int j = 0; j < Copia.Count; j++)
+                            {
+                                Auxiliar.Add(Copia.ElementAt(j));
+                            }
+                        }
+                        Copia = new List<int>();
+                        for (int j = 0; j < Auxiliar.Count; j++)
+                        {
+                            Copia.Add(Auxiliar.ElementAt(j));
+                        }
+                        if ((x - 2 >= 0 && y - 2 >= 0) && Tablero[y - 2][x - 2] != -1
+                            && Auxiliar.ElementAt(Tablero[y - 2][x - 2]) == 0)//El enemigo puede ir a la esquina sup izq doble
+                        {
+                            MoverAuxiliar(i, Tablero[y - 2][x - 2], "saltar");
+                            if (Nivel < Profundidad)
+                            {
+                                b = b - MaximizaEnemigo(1, Nivel + 1);
+                            }
+                            else
+                                b = FuncionObjetivo(2);
+                            if (b > Mayor)
+                            {
+                                Mayor = b;
+                            }
+                            Auxiliar = new List<int>();
+                            for (int j = 0; j < Copia.Count; j++)
+                            {
+                                Auxiliar.Add(Copia.ElementAt(j));
+                            }
+                        }
+                        Copia = new List<int>();
+                        for (int j = 0; j < Auxiliar.Count; j++)
+                        {
+                            Copia.Add(Auxiliar.ElementAt(j));
+                        }
+                        if ((x + 2 < 9 && y - 2 >= 0) && Tablero[y - 2][x + 2] != -1
+                            && Auxiliar.ElementAt(Tablero[y - 2][x + 2]) == 0)//El enemigo puede ir a la esquina sup der doble
+                        {
+                            MoverAuxiliar(i, Tablero[y - 2][x + 2], "clonar");
+                            if (Nivel < Profundidad)
+                            {
+                                b = b - MaximizaEnemigo(1, Nivel + 1);
+                            }
+                            else
+                                b = FuncionObjetivo(2);
+                            if (b > Mayor)
+                            {
+                                Mayor = b;
+                            }
+                            Auxiliar = new List<int>();
+                            for (int j = 0; j < Copia.Count; j++)
+                            {
+                                Auxiliar.Add(Copia.ElementAt(j));
+                            }
+                        }
+                        Copia = new List<int>();
+                        for (int j = 0; j < Auxiliar.Count; j++)
+                        {
+                            Copia.Add(Auxiliar.ElementAt(j));
+                        }
+                        if ((x - 2 >= 0 && y + 2 < 17) && Tablero[y + 2][x - 2] != -1
+                            && Auxiliar.ElementAt(Tablero[y + 2][x - 2]) == 0)//El enemigo puede ir a la esquina inf izq dob
+                        {
+                            MoverAuxiliar(i, Tablero[y + 2][x - 2], "clonar");
+                            if (Nivel < Profundidad)
+                            {
+                                b = b - MaximizaEnemigo(1, Nivel + 1);
+                            }
+                            else
+                                b = FuncionObjetivo(2);
+                            if (b > Mayor)
+                            {
+                                Mayor = b;
+                            }
+                            Auxiliar = new List<int>();
+                            for (int j = 0; j < Copia.Count; j++)
+                            {
+                                Auxiliar.Add(Copia.ElementAt(j));
+                            }
+                        }
+                        Copia = new List<int>();
+                        for (int j = 0; j < Auxiliar.Count; j++)
+                        {
+                            Copia.Add(Auxiliar.ElementAt(j));
+                        }
+                        if ((x + 2 < 9 && y + 2 < 17) && Tablero[y + 2][x + 2] != -1
+                            && Auxiliar.ElementAt(Tablero[y + 2][x + 2]) == 0)//El enemigo puede ir a la esquina inf der dob
+                        {
+                            MoverAuxiliar(i, Tablero[y + 2][x + 2], "clonar");
+                            if (Nivel < Profundidad)
+                            {
+                                b = b - MaximizaEnemigo(1, Nivel + 1);
+                            }
+                            else
+                                b = FuncionObjetivo(2);
+                            if (b > Mayor)
+                            {
+                                Mayor = b;
+                            }
+                            Auxiliar = new List<int>();
+                            for (int j = 0; j < Copia.Count; j++)
+                            {
+                                Auxiliar.Add(Copia.ElementAt(j));
+                            }
+                        }
+                        Copia = new List<int>();
+                        for (int j = 0; j < Auxiliar.Count; j++)
+                        {
+                            Copia.Add(Auxiliar.ElementAt(j));
+                        }
+                        if ((x - 1 >= 0 && y - 2 >= 0) && Tablero[y - 2][x - 1] != -1
+                            && Auxiliar.ElementAt(Tablero[y - 2][x - 1]) == 0)//El enemigo puede ir a la esquina sup izq rara
+                        {
+                            MoverAuxiliar(i, Tablero[y - 2][x - 1], "saltar");
+                            if (Nivel < Profundidad)
+                            {
+                                b = b - MaximizaEnemigo(1, Nivel + 1);
+                            }
+                            else
+                                b = FuncionObjetivo(2);
+                            if (b > Mayor)
+                            {
+                                Mayor = b;
+                            }
+                            Auxiliar = new List<int>();
+                            for (int j = 0; j < Copia.Count; j++)
+                            {
+                                Auxiliar.Add(Copia.ElementAt(j));
+                            }
+                        }
+                        Copia = new List<int>();
+                        for (int j = 0; j < Auxiliar.Count; j++)
+                        {
+                            Copia.Add(Auxiliar.ElementAt(j));
+                        }
+                        if ((x + 1 < 9 && y - 2 >= 0) && Tablero[y - 2][x + 1] != -1
+                            && Auxiliar.ElementAt(Tablero[y - 2][x + 1]) == 0)//El enemigo puede ir a la esquina sup der rara
+                        {
+                            MoverAuxiliar(i, Tablero[y - 2][x + 1], "saltar");
+                            if (Nivel < Profundidad)
+                            {
+                                b = b - MaximizaEnemigo(1, Nivel + 1);
+                            }
+                            else
+                                b = FuncionObjetivo(2);
+                            if (b > Mayor)
+                            {
+                                Mayor = b;
+                            }
+                            Auxiliar = new List<int>();
+                            for (int j = 0; j < Copia.Count; j++)
+                            {
+                                Auxiliar.Add(Copia.ElementAt(j));
+                            }
+                        }
+                        Copia = new List<int>();
+                        for (int j = 0; j < Auxiliar.Count; j++)
+                        {
+                            Copia.Add(Auxiliar.ElementAt(j));
+                        }
+                        if ((x - 1 >= 0 && y + 2 < 17) && Tablero[y+2][x - 1] != -1 
+                            && Auxiliar.ElementAt(Tablero[y + 2][x - 1]) == 0)//El enemigo puede ir a la esquina inf izq rara
+                        {
+                            MoverAuxiliar(i, Tablero[y + 2][x - 1], "saltar");
+                            if (Nivel < Profundidad)
+                            {
+                                b = b - MaximizaEnemigo(1, Nivel + 1);
+                            }
+                            else
+                                b = FuncionObjetivo(2);
+                            if (b > Mayor)
+                            {
+                                Mayor = b;
+                            }
+                            Auxiliar = new List<int>();
+                            for (int j = 0; j < Copia.Count; j++)
+                            {
+                                Auxiliar.Add(Copia.ElementAt(j));
+                            }
+                        }
+                        Copia = new List<int>();
+                        for (int j = 0; j < Auxiliar.Count; j++)
+                        {
+                            Copia.Add(Auxiliar.ElementAt(j));
+                        }
+                        if ((x + 1 < 9 && y + 2 < 17) && Tablero[y+2][x+1]!=-1 
+                            && Auxiliar.ElementAt(Tablero[y + 2][x + 1]) == 0)//El enemigo puede ir a la esquina inf der rara
+                        {
+                            MoverAuxiliar(i, Tablero[y + 2][x + 1], "saltar");
+                            if (Nivel < Profundidad)
+                            {
+                                b = b - MaximizaEnemigo(1, Nivel + 1);
+                            }
+                            else
+                                b = FuncionObjetivo(2);
+                            if (b > Mayor)
+                            {
+                                Mayor = b;
+                            }
+                            Auxiliar = new List<int>();
+                            for (int j = 0; j < Copia.Count; j++)
+                            {
+                                Auxiliar.Add(Copia.ElementAt(j));
+                            }
+                        }
+                    }
+                }
+            }
+            return b;
         }
 
-        private int Maximiza(int NodoI, ref int NodoF, int Player)
+        private int Maximiza(int NodoI, ref int NodoF, int Player, ref string Accion)
         {
             int a = 0, x = 0, y = 0, Mayor = -999, b = 0;
             List<int> Copia = new List<int>();
@@ -577,7 +1540,7 @@ namespace Proyecto
             {
                 Copia.Add(Auxiliar.ElementAt(i));
             }
-            if ((x - 1 >= 0 && y - 1 >= 0) && Auxiliar.ElementAt(Tablero[y - 1][x - 1]) == 0)//Me puedo clonar esq sup izq
+            if ((x - 1 >= 0 && y - 1 >= 0) && Tablero[y - 1][x - 1] != -1 && Auxiliar.ElementAt(Tablero[y - 1][x - 1]) == 0)//Me puedo clonar esq sup izq
             {
                 MoverAuxiliar(NodoI, Tablero[y - 1][x - 1], "clonar");
                 a = FuncionObjetivo(Player);
@@ -586,6 +1549,7 @@ namespace Proyecto
                 {
                     Mayor = a - b;
                     NodoF = Tablero[y - 1][x - 1];
+                    Accion = "clonar";
                 }
                 Auxiliar = new List<int>();
                 for (int i = 0; i < Copia.Count; i++)
@@ -593,6 +1557,352 @@ namespace Proyecto
                     Auxiliar.Add(Copia.ElementAt(i));
                 }
             }
+
+            Copia = new List<int>();
+            for (int i = 0; i < Auxiliar.Count; i++)
+            {
+                Copia.Add(Auxiliar.ElementAt(i));
+            }
+            if ((x + 1 < 9 && y - 1 >= 0) && Tablero[y - 1][x + 1]!=-1 && Auxiliar.ElementAt(Tablero[y - 1][x + 1]) == 0)//Me puedo clonar esq sup der
+            {
+                MoverAuxiliar(NodoI, Tablero[y - 1][x + 1], "clonar");
+                a = FuncionObjetivo(Player);
+                b = MaximizaEnemigo(Player);
+                if ((a - b) > Mayor)
+                {
+                    Mayor = a - b;
+                    NodoF = Tablero[y - 1][x + 1];
+                    Accion = "clonar";
+                }
+                Auxiliar = new List<int>();
+                for (int i = 0; i < Copia.Count; i++)
+                {
+                    Auxiliar.Add(Copia.ElementAt(i));
+                }
+            }
+
+            Copia = new List<int>();
+            for (int i = 0; i < Auxiliar.Count; i++)
+            {
+                Copia.Add(Auxiliar.ElementAt(i));
+            }
+            if ((x - 1 >= 0 && y + 1 < 17) && Tablero[y + 1][x - 1] != -1 && Auxiliar.ElementAt(Tablero[y + 1][x - 1]) == 0)//Me puedo clonar esq inf izq
+            {
+                MoverAuxiliar(NodoI, Tablero[y + 1][x - 1], "clonar");
+                a = FuncionObjetivo(Player);
+                b = MaximizaEnemigo(Player);
+                if ((a - b) > Mayor)
+                {
+                    Mayor = a - b;
+                    NodoF = Tablero[y + 1][x - 1];
+                    Accion = "clonar";
+                }
+                Auxiliar = new List<int>();
+                for (int i = 0; i < Copia.Count; i++)
+                {
+                    Auxiliar.Add(Copia.ElementAt(i));
+                }
+            }
+
+            Copia = new List<int>();
+            for (int i = 0; i < Auxiliar.Count; i++)
+            {
+                Copia.Add(Auxiliar.ElementAt(i));
+            }
+            if ((x + 1 < 9 && y + 1 < 17) && Tablero[y + 1][x + 1] != -1 && Auxiliar.ElementAt(Tablero[y + 1][x + 1]) == 0)//Me puedo clonar esq inf der
+            {
+                MoverAuxiliar(NodoI, Tablero[y + 1][x + 1], "clonar");
+                a = FuncionObjetivo(Player);
+                b = MaximizaEnemigo(Player);
+                if ((a - b) > Mayor)
+                {
+                    Mayor = a - b;
+                    NodoF = Tablero[y + 1][x + 1];
+                    Accion = "clonar";
+                }
+                Auxiliar = new List<int>();
+                for (int i = 0; i < Copia.Count; i++)
+                {
+                    Auxiliar.Add(Copia.ElementAt(i));
+                }
+            }
+
+            Copia = new List<int>();
+            for (int i = 0; i < Auxiliar.Count; i++)
+            {
+                Copia.Add(Auxiliar.ElementAt(i));
+            }
+            if ((x + 2 < 9 && y + 2 < 17) && Tablero[y + 2][x + 2] != -1 && Auxiliar.ElementAt(Tablero[y + 2][x + 2]) == 0)//Puedo Saltar esq inf der doble
+            {
+                MoverAuxiliar(NodoI, Tablero[y + 2][x + 2], "saltar");
+                a = FuncionObjetivo(Player);
+                b = MaximizaEnemigo(Player);
+                if ((a - b) > Mayor)
+                {
+                    Mayor = a - b;
+                    NodoF = Tablero[y + 2][x + 2];
+                    Accion = "saltar";
+                }
+                Auxiliar = new List<int>();
+                for (int i = 0; i < Copia.Count; i++)
+                {
+                    Auxiliar.Add(Copia.ElementAt(i));
+                }
+            }
+
+            Copia = new List<int>();
+            for (int i = 0; i < Auxiliar.Count; i++)
+            {
+                Copia.Add(Auxiliar.ElementAt(i));
+            }
+            if ((x - 2 >= 0 && y + 2 < 17) && Tablero[y + 2][x - 2] != -1 && Auxiliar.ElementAt(Tablero[y + 2][x - 2]) == 0)//Puedo Saltar esq inf izq doble
+            {
+                MoverAuxiliar(NodoI, Tablero[y + 2][x - 2], "saltar");
+                a = FuncionObjetivo(Player);
+                b = MaximizaEnemigo(Player);
+                if ((a - b) > Mayor)
+                {
+                    Mayor = a - b;
+                    NodoF = Tablero[y + 2][x - 2];
+                    Accion = "saltar";
+                }
+                Auxiliar = new List<int>();
+                for (int i = 0; i < Copia.Count; i++)
+                {
+                    Auxiliar.Add(Copia.ElementAt(i));
+                }
+            }
+
+            Copia = new List<int>();
+            for (int i = 0; i < Auxiliar.Count; i++)
+            {
+                Copia.Add(Auxiliar.ElementAt(i));
+            }
+            if ((x - 2 >= 0 && y - 2 >= 0) && Tablero[y-2][x-2]!=-1 && Auxiliar.ElementAt(Tablero[y - 2][x - 2]) == 0)//Puedo Saltar esq sup izq doble
+            {
+                MoverAuxiliar(NodoI, Tablero[y - 2][x - 2], "saltar");
+                a = FuncionObjetivo(Player);
+                b = MaximizaEnemigo(Player);
+                if ((a - b) > Mayor)
+                {
+                    Mayor = a - b;
+                    NodoF = Tablero[y - 2][x - 2];
+                    Accion = "saltar";
+                }
+                Auxiliar = new List<int>();
+                for (int i = 0; i < Copia.Count; i++)
+                {
+                    Auxiliar.Add(Copia.ElementAt(i));
+                }
+            }
+
+            Copia = new List<int>();
+            for (int i = 0; i < Auxiliar.Count; i++)
+            {
+                Copia.Add(Auxiliar.ElementAt(i));
+            }
+            if ((x + 2 < 9 && y - 2 >= 0) && Tablero[y - 2][x + 2] != -1 && Auxiliar.ElementAt(Tablero[y - 2][x + 2]) == 0)//Puedo Saltar esq sup der doble
+            {
+                MoverAuxiliar(NodoI, Tablero[y - 2][x + 2], "saltar");
+                a = FuncionObjetivo(Player);
+                b = MaximizaEnemigo(Player);
+                if ((a - b) > Mayor)
+                {
+                    Mayor = a - b;
+                    NodoF = Tablero[y - 2][x + 2];
+                    Accion = "saltar";
+                }
+                Auxiliar = new List<int>();
+                for (int i = 0; i < Copia.Count; i++)
+                {
+                    Auxiliar.Add(Copia.ElementAt(i));
+                }
+            }
+
+            Copia = new List<int>();
+            for (int i = 0; i < Auxiliar.Count; i++)
+            {
+                Copia.Add(Auxiliar.ElementAt(i));
+            }
+            if ((x + 1 < 9 && y + 2 < 17) && Tablero[y + 2][x + 1] != -1 && Auxiliar.ElementAt(Tablero[y + 2][x + 1]) == 0)//Puedo Saltar esq inf der rara
+            {
+                MoverAuxiliar(NodoI, Tablero[y + 2][x + 1], "saltar");
+                a = FuncionObjetivo(Player);
+                b = MaximizaEnemigo(Player);
+                if ((a - b) > Mayor)
+                {
+                    Mayor = a - b;
+                    NodoF = Tablero[y + 2][x + 1];
+                    Accion = "saltar";
+                }
+                Auxiliar = new List<int>();
+                for (int i = 0; i < Copia.Count; i++)
+                {
+                    Auxiliar.Add(Copia.ElementAt(i));
+                }
+            }
+
+            Copia = new List<int>();
+            for (int i = 0; i < Auxiliar.Count; i++)
+            {
+                Copia.Add(Auxiliar.ElementAt(i));
+            }
+            if ((x - 1 >= 0 && y + 2 < 17) && Tablero[y + 2][x - 1] != -1 && Auxiliar.ElementAt(Tablero[y + 2][x - 1]) == 0)//Puedo Saltar esq inf izq rara
+            {
+                MoverAuxiliar(NodoI, Tablero[y + 2][x - 1], "saltar");
+                a = FuncionObjetivo(Player);
+                b = MaximizaEnemigo(Player);
+                if ((a - b) > Mayor)
+                {
+                    Mayor = a - b;
+                    NodoF = Tablero[y + 2][x - 1];
+                    Accion = "saltar";
+                }
+                Auxiliar = new List<int>();
+                for (int i = 0; i < Copia.Count; i++)
+                {
+                    Auxiliar.Add(Copia.ElementAt(i));
+                }
+            }
+
+            Copia = new List<int>();
+            for (int i = 0; i < Auxiliar.Count; i++)
+            {
+                Copia.Add(Auxiliar.ElementAt(i));
+            }
+            if ((x - 1 >= 0 && y - 2 >= 0) && Tablero[y - 2][x - 1] != -1 && Auxiliar.ElementAt(Tablero[y - 2][x - 1]) == 0)//Puedo Saltar esq sup izq rara
+            {
+                MoverAuxiliar(NodoI, Tablero[y - 2][x - 1], "saltar");
+                a = FuncionObjetivo(Player);
+                b = MaximizaEnemigo(Player);
+                if ((a - b) > Mayor)
+                {
+                    Mayor = a - b;
+                    NodoF = Tablero[y - 2][x - 1];
+                    Accion = "saltar";
+                }
+                Auxiliar = new List<int>();
+                for (int i = 0; i < Copia.Count; i++)
+                {
+                    Auxiliar.Add(Copia.ElementAt(i));
+                }
+            }
+
+            Copia = new List<int>();
+            for (int i = 0; i < Auxiliar.Count; i++)
+            {
+                Copia.Add(Auxiliar.ElementAt(i));
+            }
+            if ((x + 1 < 9 && y - 2 >= 0) && Tablero[y - 2][x + 1] != -1 && Auxiliar.ElementAt(Tablero[y - 2][x + 1]) == 0)//Puedo Saltar esq sup der rara
+            {
+                MoverAuxiliar(NodoI, Tablero[y - 2][x + 1], "saltar");
+                a = FuncionObjetivo(Player);
+                b = MaximizaEnemigo(Player);
+                if ((a - b) > Mayor)
+                {
+                    Mayor = a - b;
+                    NodoF = Tablero[y - 2][x + 1];
+                    Accion = "saltar";
+                }
+                Auxiliar = new List<int>();
+                for (int i = 0; i < Copia.Count; i++)
+                {
+                    Auxiliar.Add(Copia.ElementAt(i));
+                }
+            }
+
+            Copia = new List<int>();
+            for (int i = 0; i < Auxiliar.Count; i++)
+            {
+                Copia.Add(Auxiliar.ElementAt(i));
+            }
+            if (y - 2 >= 0 && Tablero[y - 2][x] != -1 && Auxiliar.ElementAt(Tablero[y - 2][x]) == 0)//Puedo Saltar arriba doble
+            {
+                MoverAuxiliar(NodoI, Tablero[y - 2][x], "saltar");
+                a = FuncionObjetivo(Player);
+                b = MaximizaEnemigo(Player);
+                if ((a - b) > Mayor)
+                {
+                    Mayor = a - b;
+                    NodoF = Tablero[y - 2][x];
+                    Accion = "saltar";
+                }
+                Auxiliar = new List<int>();
+                for (int i = 0; i < Copia.Count; i++)
+                {
+                    Auxiliar.Add(Copia.ElementAt(i));
+                }
+            }
+
+            Copia = new List<int>();
+            for (int i = 0; i < Auxiliar.Count; i++)
+            {
+                Copia.Add(Auxiliar.ElementAt(i));
+            }
+            if (y + 2 < 17 && Tablero[y + 2][x] != -1 && Auxiliar.ElementAt(Tablero[y + 2][x]) == 0)//Puedo Saltar abajo doble
+            {
+                MoverAuxiliar(NodoI, Tablero[y + 2][x], "saltar");
+                a = FuncionObjetivo(Player);
+                b = MaximizaEnemigo(Player);
+                if ((a - b) > Mayor)
+                {
+                    Mayor = a - b;
+                    NodoF = Tablero[y + 2][x];
+                    Accion = "saltar";
+                }
+                Auxiliar = new List<int>();
+                for (int i = 0; i < Copia.Count; i++)
+                {
+                    Auxiliar.Add(Copia.ElementAt(i));
+                }
+            }
+
+            Copia = new List<int>();
+            for (int i = 0; i < Auxiliar.Count; i++)
+            {
+                Copia.Add(Auxiliar.ElementAt(i));
+            }
+            if (x + 2 < 9 && Tablero[y][x + 2] != -1 && Auxiliar.ElementAt(Tablero[y][x + 2]) == 0)//Puedo Saltar der
+            {
+                MoverAuxiliar(NodoI, Tablero[y][x + 2], "saltar");
+                a = FuncionObjetivo(Player);
+                b = MaximizaEnemigo(Player);
+                if ((a - b) > Mayor)
+                {
+                    Mayor = a - b;
+                    NodoF = Tablero[y][x + 2];
+                    Accion = "saltar";
+                }
+                Auxiliar = new List<int>();
+                for (int i = 0; i < Copia.Count; i++)
+                {
+                    Auxiliar.Add(Copia.ElementAt(i));
+                }
+            }
+
+            Copia = new List<int>();
+            for (int i = 0; i < Auxiliar.Count; i++)
+            {
+                Copia.Add(Auxiliar.ElementAt(i));
+            }
+            if (x - 2 >= 0 && Tablero[y][x - 2] != -1 && Auxiliar.ElementAt(Tablero[y][x - 2]) == 0)//Puedo Saltar izq
+            {
+                MoverAuxiliar(NodoI, Tablero[y][x - 2], "saltar");
+                a = FuncionObjetivo(Player);
+                b = MaximizaEnemigo(Player);
+                if ((a - b) > Mayor)
+                {
+                    Mayor = a - b;
+                    NodoF = Tablero[y][x - 2];
+                    Accion = "saltar";
+                }
+                Auxiliar = new List<int>();
+                for (int i = 0; i < Copia.Count; i++)
+                {
+                    Auxiliar.Add(Copia.ElementAt(i));
+                }
+            }
+
             return Mayor;
         }
     }
