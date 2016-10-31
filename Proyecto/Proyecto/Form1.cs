@@ -16,6 +16,7 @@ namespace Proyecto
         private int[][] Tablero;
         private List<int> Auxiliar;
         private const int Profundidad = 1;
+        private int turno = 1;
         public Form1()
         {
             InitializeComponent();
@@ -59,15 +60,6 @@ namespace Proyecto
                     c2++;
                 }
                 c3 = 0;
-            }
-
-            for(int i = 0; i < 17; i++)
-            {
-                for(int j = 0; j < 9; j++)
-                {
-                    richTextBox1.AppendText(Tablero[i][j].ToString() + " ");
-                }
-                richTextBox1.AppendText(Environment.NewLine);
             }
 
             Fichas = new List<PictureBox>();
@@ -296,8 +288,8 @@ namespace Proyecto
                 if (x - 2 >= 0 && Tablero[y][x - 2] == NodoF
                     && ((int)Fichas.ElementAt(Tablero[y][x - 2]).Tag) == 0)//Puedo saltar hacia izq
                     return true;
-                if (x + 2 < 17 && Tablero[y][x - 2] == NodoF
-                    && ((int)Fichas.ElementAt(Tablero[y][x - 2]).Tag) == 0)//Puedo saltar hacia der
+                if (x + 2 < 9 && Tablero[y][x + 2] == NodoF
+                    && ((int)Fichas.ElementAt(Tablero[y][x + 2]).Tag) == 0)//Puedo saltar hacia der
                     return true;
             }
             return false;
@@ -363,8 +355,8 @@ namespace Proyecto
                 if (x - 2 >= 0 && Tablero[y][x - 2] == NodoF
                     && (Auxiliar.ElementAt(Tablero[y][x - 2])) == 0)//Puedo saltar hacia izq
                     return true;
-                if (x + 2 < 17 && Tablero[y][x - 2] == NodoF
-                    && (Auxiliar.ElementAt(Tablero[y][x - 2])) == 0)//Puedo saltar hacia der
+                if (x + 2 < 17 && Tablero[y][x + 2] == NodoF
+                    && (Auxiliar.ElementAt(Tablero[y][x + 2])) == 0)//Puedo saltar hacia der
                     return true;
             }
             return false;
@@ -503,7 +495,7 @@ namespace Proyecto
                 if (x - 2 >= 0 && Tablero[y][x - 2] == NodoF
                     && ((int)Fichas.ElementAt(Tablero[y][x - 2]).Tag) == 0)//Puedo saltar hacia izq
                     Fichas.ElementAt(Tablero[y][x - 2]).Tag = Fichas.ElementAt(NodoI).Tag;
-                if (x + 2 < 17 && Tablero[y][x + 2] == NodoF
+                if (x + 2 < 9 && Tablero[y][x + 2] == NodoF
                     && ((int)Fichas.ElementAt(Tablero[y][x + 2]).Tag) == 0)//Puedo saltar hacia der
                     Fichas.ElementAt(Tablero[y][x + 2]).Tag = Fichas.ElementAt(NodoI).Tag;
                 Fichas.ElementAt(NodoI).Tag = 0;
@@ -588,7 +580,7 @@ namespace Proyecto
                 if (x - 2 >= 0 && Tablero[y][x - 2] == NodoF
                     && (Auxiliar.ElementAt(Tablero[y][x - 2])) == 0)//Puedo saltar hacia izq
                     Auxiliar[Tablero[y][x - 2]] = Auxiliar.ElementAt(NodoI);
-                if (x + 2 < 17 && Tablero[y][x + 2] == NodoF
+                if (x + 2 < 9 && Tablero[y][x + 2] == NodoF
                     && (Auxiliar.ElementAt(Tablero[y][x + 2])) == 0)//Puedo saltar hacia der
                     Auxiliar[Tablero[y ][x + 2]] = Auxiliar.ElementAt(NodoI);
                 Auxiliar[NodoI] = 0;
@@ -689,7 +681,7 @@ namespace Proyecto
                             Copia.Add(Auxiliar.ElementAt(j));
                         }
                         if ((x + 1 < 9 && y + 1 < 17) && Tablero[y + 1][x + 1] != -1
-                            && Auxiliar.ElementAt(Tablero[y + 1][x - 1]) == 0)//El enemigo puede ir a la esquina inf der
+                            && Auxiliar.ElementAt(Tablero[y + 1][x + 1]) == 0)//El enemigo puede ir a la esquina inf der
                         {
                             MoverAuxiliar(i, Tablero[y + 1][x + 1], "clonar");
                             if (Nivel < Profundidad)
@@ -891,7 +883,7 @@ namespace Proyecto
                         if ((x + 2 < 9 && y - 2 >= 0) && Tablero[y - 2][x + 2] != -1
                             && Auxiliar.ElementAt(Tablero[y - 2][x + 2]) == 0)//El enemigo puede ir a la esquina sup der doble
                         {
-                            MoverAuxiliar(i, Tablero[y - 2][x + 2], "clonar");
+                            MoverAuxiliar(i, Tablero[y - 2][x + 2], "saltar");
                             if (Nivel < Profundidad)
                             {
                                 b = b - MaximizaEnemigo(2, Nivel + 1);
@@ -916,7 +908,7 @@ namespace Proyecto
                         if ((x - 2 >= 0 && y + 2 < 17) && Tablero[y + 2][x - 2] != -1
                             && Auxiliar.ElementAt(Tablero[y + 2][x - 2]) == 0)//El enemigo puede ir a la esquina inf izq dob
                         {
-                            MoverAuxiliar(i, Tablero[y + 2][x - 2], "clonar");
+                            MoverAuxiliar(i, Tablero[y + 2][x - 2], "saltar");
                             if (Nivel < Profundidad)
                             {
                                 b = b - MaximizaEnemigo(2, Nivel + 1);
@@ -941,7 +933,7 @@ namespace Proyecto
                         if ((x + 2 < 9 && y + 2 < 17) && Tablero[y + 2][x + 2] != -1
                             && Auxiliar.ElementAt(Tablero[y + 2][x + 2]) == 0)//El enemigo puede ir a la esquina inf der dob
                         {
-                            MoverAuxiliar(i, Tablero[y + 2][x + 2], "clonar");
+                            MoverAuxiliar(i, Tablero[y + 2][x + 2], "saltar");
                             if (Nivel < Profundidad)
                             {
                                 b = b - MaximizaEnemigo(2, Nivel + 1);
@@ -1149,7 +1141,7 @@ namespace Proyecto
                             Copia.Add(Auxiliar.ElementAt(j));
                         }
                         if ((x + 1 < 9 && y + 1 < 17) && Tablero[y + 1][x + 1] != -1
-                            && Auxiliar.ElementAt(Tablero[y + 1][x - 1]) == 0)//El enemigo puede ir a la esquina inf der
+                            && Auxiliar.ElementAt(Tablero[y + 1][x + 1]) == 0)//El enemigo puede ir a la esquina inf der
                         {
                             MoverAuxiliar(i, Tablero[y + 1][x + 1], "clonar");
                             if (Nivel < Profundidad)
@@ -1351,7 +1343,7 @@ namespace Proyecto
                         if ((x + 2 < 9 && y - 2 >= 0) && Tablero[y - 2][x + 2] != -1
                             && Auxiliar.ElementAt(Tablero[y - 2][x + 2]) == 0)//El enemigo puede ir a la esquina sup der doble
                         {
-                            MoverAuxiliar(i, Tablero[y - 2][x + 2], "clonar");
+                            MoverAuxiliar(i, Tablero[y - 2][x + 2], "saltar");
                             if (Nivel < Profundidad)
                             {
                                 b = b - MaximizaEnemigo(1, Nivel + 1);
@@ -1376,7 +1368,7 @@ namespace Proyecto
                         if ((x - 2 >= 0 && y + 2 < 17) && Tablero[y + 2][x - 2] != -1
                             && Auxiliar.ElementAt(Tablero[y + 2][x - 2]) == 0)//El enemigo puede ir a la esquina inf izq dob
                         {
-                            MoverAuxiliar(i, Tablero[y + 2][x - 2], "clonar");
+                            MoverAuxiliar(i, Tablero[y + 2][x - 2], "saltar");
                             if (Nivel < Profundidad)
                             {
                                 b = b - MaximizaEnemigo(1, Nivel + 1);
@@ -1401,7 +1393,7 @@ namespace Proyecto
                         if ((x + 2 < 9 && y + 2 < 17) && Tablero[y + 2][x + 2] != -1
                             && Auxiliar.ElementAt(Tablero[y + 2][x + 2]) == 0)//El enemigo puede ir a la esquina inf der dob
                         {
-                            MoverAuxiliar(i, Tablero[y + 2][x + 2], "clonar");
+                            MoverAuxiliar(i, Tablero[y + 2][x + 2], "saltar");
                             if (Nivel < Profundidad)
                             {
                                 b = b - MaximizaEnemigo(1, Nivel + 1);
@@ -1521,7 +1513,7 @@ namespace Proyecto
                     }
                 }
             }
-            return b;
+            return Mayor;
         }
 
         private int Maximiza(int NodoI, ref int NodoF, int Player, ref string Accion)
@@ -1534,6 +1526,8 @@ namespace Proyecto
             {
                 Auxiliar.Add(((int)Fichas.ElementAt(i).Tag));
             }
+
+            
 
             Copia = new List<int>();
             for(int i = 0; i < Auxiliar.Count; i++)
@@ -1816,16 +1810,62 @@ namespace Proyecto
             {
                 Copia.Add(Auxiliar.ElementAt(i));
             }
-            if (y - 2 >= 0 && Tablero[y - 2][x] != -1 && Auxiliar.ElementAt(Tablero[y - 2][x]) == 0)//Puedo Saltar arriba doble
+            if (y - 4 >= 0 && Tablero[y - 4][x] != -1 && Auxiliar.ElementAt(Tablero[y - 4][x]) == 0)//Puedo Saltar arriba doble
             {
-                MoverAuxiliar(NodoI, Tablero[y - 2][x], "saltar");
+                MoverAuxiliar(NodoI, Tablero[y - 4][x], "saltar");
+                a = FuncionObjetivo(Player);
+                b = MaximizaEnemigo(Player);
+                if ((a - b) > Mayor)
+                {
+                    Mayor = a - b;
+                    NodoF = Tablero[y - 4][x];
+                    Accion = "saltar";
+                }
+                Auxiliar = new List<int>();
+                for (int i = 0; i < Copia.Count; i++)
+                {
+                    Auxiliar.Add(Copia.ElementAt(i));
+                }
+            }
+
+            Copia = new List<int>();
+            for (int i = 0; i < Auxiliar.Count; i++)
+            {
+                Copia.Add(Auxiliar.ElementAt(i));
+            }
+            if (y + 4 < 17 && Tablero[y + 4][x] != -1 && Auxiliar.ElementAt(Tablero[y + 4][x]) == 0)//Puedo Saltar abajo doble
+            {
+                MoverAuxiliar(NodoI, Tablero[y + 4][x], "saltar");
+                a = FuncionObjetivo(Player);
+                b = MaximizaEnemigo(Player);
+                if ((a - b) > Mayor)
+                {
+                    Mayor = a - b;
+                    NodoF = Tablero[y + 4][x];
+                    Accion = "saltar";
+                }
+                Auxiliar = new List<int>();
+                for (int i = 0; i < Copia.Count; i++)
+                {
+                    Auxiliar.Add(Copia.ElementAt(i));
+                }
+            }
+
+            Copia = new List<int>();
+            for (int i = 0; i < Auxiliar.Count; i++)
+            {
+                Copia.Add(Auxiliar.ElementAt(i));
+            }
+            if (y - 2 >= 0 && Tablero[y - 2][x] != -1 && Auxiliar.ElementAt(Tablero[y - 2][x]) == 0)//Puedo clonar arriba
+            {
+                MoverAuxiliar(NodoI, Tablero[y - 2][x], "clonar");
                 a = FuncionObjetivo(Player);
                 b = MaximizaEnemigo(Player);
                 if ((a - b) > Mayor)
                 {
                     Mayor = a - b;
                     NodoF = Tablero[y - 2][x];
-                    Accion = "saltar";
+                    Accion = "clonar";
                 }
                 Auxiliar = new List<int>();
                 for (int i = 0; i < Copia.Count; i++)
@@ -1841,14 +1881,14 @@ namespace Proyecto
             }
             if (y + 2 < 17 && Tablero[y + 2][x] != -1 && Auxiliar.ElementAt(Tablero[y + 2][x]) == 0)//Puedo Saltar abajo doble
             {
-                MoverAuxiliar(NodoI, Tablero[y + 2][x], "saltar");
+                MoverAuxiliar(NodoI, Tablero[y + 2][x], "clonar");
                 a = FuncionObjetivo(Player);
                 b = MaximizaEnemigo(Player);
                 if ((a - b) > Mayor)
                 {
                     Mayor = a - b;
                     NodoF = Tablero[y + 2][x];
-                    Accion = "saltar";
+                    Accion = "clonar";
                 }
                 Auxiliar = new List<int>();
                 for (int i = 0; i < Copia.Count; i++)
@@ -1904,6 +1944,32 @@ namespace Proyecto
             }
 
             return Mayor;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            int Mayor = -999, final = 0,f=0,inicial=0;
+            string Accion = "",Ac="";
+            int a;
+            for(int i = 0; i < Fichas.Count; i++)
+            {
+                if (((int)Fichas.ElementAt(i).Tag) == turno)
+                {
+                    a = Maximiza(i, ref f, turno, ref Ac);
+                    if (a > Mayor)
+                    {
+                        final = f;
+                        Accion = Ac;
+                        Mayor = a;
+                        inicial = i;
+                    }
+                }
+            }
+            Mover(inicial, final, Accion);
+            if (turno == 1)
+                turno = 2;
+            else
+                turno = 1;
         }
     }
 }
