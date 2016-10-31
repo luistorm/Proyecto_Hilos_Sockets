@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Threading;
 
 namespace Proyecto
 {
@@ -432,11 +433,6 @@ namespace Proyecto
 
         private void Mover(int NodoI,int NodoF,string Accion)
         {
-            if (!MovPosible(NodoI, NodoF, Accion))
-            {
-                MessageBox.Show("Movimiento imposible: " + NodoI.ToString() + "->" + NodoF.ToString() + " " + Accion);
-                return;
-            }
             int x = 0, y = 0;
             ObtieneCoordenadas(ref x, ref y, NodoI);
             if (Accion.CompareTo("clonar") == 0)
@@ -517,11 +513,6 @@ namespace Proyecto
 
         private void MoverAuxiliar(int NodoI,int NodoF, string Accion)
         {
-            if (!MovPosibleAuxiliar(NodoI, NodoF, Accion))
-            {
-                MessageBox.Show("Movimiento imposible del Auxiliar: " + NodoI.ToString() + "->" + NodoF.ToString() + " " + Accion);
-                return;
-            }
             int x = 0, y = 0;
             ObtieneCoordenadas(ref x, ref y, NodoI);
             if (Accion.CompareTo("clonar") == 0)
@@ -1074,7 +1065,7 @@ namespace Proyecto
                                 b = b - MaximizaEnemigo(1, Nivel + 1);
                             }
                             else
-                                b = FuncionObjetivo(2);
+                                b = FuncionObjetivo(1);
                             if (b > Mayor)
                             {
                                 Mayor = b;
@@ -1099,7 +1090,7 @@ namespace Proyecto
                                 b = b - MaximizaEnemigo(1, Nivel + 1);
                             }
                             else
-                                b = FuncionObjetivo(2);
+                                b = FuncionObjetivo(1);
                             if (b > Mayor)
                             {
                                 Mayor = b;
@@ -1124,7 +1115,7 @@ namespace Proyecto
                                 b = b - MaximizaEnemigo(1, Nivel + 1);
                             }
                             else
-                                b = FuncionObjetivo(2);
+                                b = FuncionObjetivo(1);
                             if (b > Mayor)
                             {
                                 Mayor = b;
@@ -1149,7 +1140,7 @@ namespace Proyecto
                                 b = b - MaximizaEnemigo(1, Nivel + 1);
                             }
                             else
-                                b = FuncionObjetivo(2);
+                                b = FuncionObjetivo(1);
                             if (b > Mayor)
                             {
                                 Mayor = b;
@@ -1174,7 +1165,7 @@ namespace Proyecto
                                 b = b - MaximizaEnemigo(1, Nivel + 1);
                             }
                             else
-                                b = FuncionObjetivo(2);
+                                b = FuncionObjetivo(1);
                             if (b > Mayor)
                             {
                                 Mayor = b;
@@ -1199,7 +1190,7 @@ namespace Proyecto
                                 b = b - MaximizaEnemigo(1, Nivel + 1);
                             }
                             else
-                                b = FuncionObjetivo(2);
+                                b = FuncionObjetivo(1);
                             if (b > Mayor)
                             {
                                 Mayor = b;
@@ -1224,7 +1215,7 @@ namespace Proyecto
                                 b = b - MaximizaEnemigo(1, Nivel + 1);
                             }
                             else
-                                b = FuncionObjetivo(2);
+                                b = FuncionObjetivo(1);
                             if (b > Mayor)
                             {
                                 Mayor = b;
@@ -1249,7 +1240,7 @@ namespace Proyecto
                                 b = b - MaximizaEnemigo(1, Nivel + 1);
                             }
                             else
-                                b = FuncionObjetivo(2);
+                                b = FuncionObjetivo(1);
                             if (b > Mayor)
                             {
                                 Mayor = b;
@@ -1274,7 +1265,7 @@ namespace Proyecto
                                 b = b - MaximizaEnemigo(1, Nivel + 1);
                             }
                             else
-                                b = FuncionObjetivo(2);
+                                b = FuncionObjetivo(1);
                             if (b > Mayor)
                             {
                                 Mayor = b;
@@ -1299,7 +1290,7 @@ namespace Proyecto
                                 b = b - MaximizaEnemigo(1, Nivel + 1);
                             }
                             else
-                                b = FuncionObjetivo(2);
+                                b = FuncionObjetivo(1);
                             if (b > Mayor)
                             {
                                 Mayor = b;
@@ -1324,7 +1315,7 @@ namespace Proyecto
                                 b = b - MaximizaEnemigo(1, Nivel + 1);
                             }
                             else
-                                b = FuncionObjetivo(2);
+                                b = FuncionObjetivo(1);
                             if (b > Mayor)
                             {
                                 Mayor = b;
@@ -1349,7 +1340,7 @@ namespace Proyecto
                                 b = b - MaximizaEnemigo(1, Nivel + 1);
                             }
                             else
-                                b = FuncionObjetivo(2);
+                                b = FuncionObjetivo(1);
                             if (b > Mayor)
                             {
                                 Mayor = b;
@@ -1374,7 +1365,7 @@ namespace Proyecto
                                 b = b - MaximizaEnemigo(1, Nivel + 1);
                             }
                             else
-                                b = FuncionObjetivo(2);
+                                b = FuncionObjetivo(1);
                             if (b > Mayor)
                             {
                                 Mayor = b;
@@ -1399,7 +1390,7 @@ namespace Proyecto
                                 b = b - MaximizaEnemigo(1, Nivel + 1);
                             }
                             else
-                                b = FuncionObjetivo(2);
+                                b = FuncionObjetivo(1);
                             if (b > Mayor)
                             {
                                 Mayor = b;
@@ -1424,7 +1415,7 @@ namespace Proyecto
                                 b = b - MaximizaEnemigo(1, Nivel + 1);
                             }
                             else
-                                b = FuncionObjetivo(2);
+                                b = FuncionObjetivo(1);
                             if (b > Mayor)
                             {
                                 Mayor = b;
@@ -1449,7 +1440,7 @@ namespace Proyecto
                                 b = b - MaximizaEnemigo(1, Nivel + 1);
                             }
                             else
-                                b = FuncionObjetivo(2);
+                                b = FuncionObjetivo(1);
                             if (b > Mayor)
                             {
                                 Mayor = b;
@@ -1474,7 +1465,7 @@ namespace Proyecto
                                 b = b - MaximizaEnemigo(1, Nivel + 1);
                             }
                             else
-                                b = FuncionObjetivo(2);
+                                b = FuncionObjetivo(1);
                             if (b > Mayor)
                             {
                                 Mayor = b;
@@ -1499,7 +1490,7 @@ namespace Proyecto
                                 b = b - MaximizaEnemigo(1, Nivel + 1);
                             }
                             else
-                                b = FuncionObjetivo(2);
+                                b = FuncionObjetivo(1);
                             if (b > Mayor)
                             {
                                 Mayor = b;
@@ -1946,30 +1937,53 @@ namespace Proyecto
             return Mayor;
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private bool Fin(int Player)
         {
-            int Mayor = -999, final = 0,f=0,inicial=0;
-            string Accion = "",Ac="";
-            int a;
             for(int i = 0; i < Fichas.Count; i++)
             {
-                if (((int)Fichas.ElementAt(i).Tag) == turno)
+                if (((int)Fichas.ElementAt(i).Tag) != Player && ((int)Fichas.ElementAt(i).Tag) != 0)
+                    return false;
+            }
+            return true;
+        }
+
+        private bool Lleno()
+        {
+            for (int i = 0; i < Fichas.Count; i++)
+            {
+                if (((int)Fichas.ElementAt(i).Tag) == 0)
+                    return false;
+            }
+            return true;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            do{
+                int Mayor = -999, final = 0, f = 0, inicial = 0;
+                string Accion = "", Ac = "";
+                int a;
+                for (int i = 0; i < Fichas.Count; i++)
                 {
-                    a = Maximiza(i, ref f, turno, ref Ac);
-                    if (a > Mayor)
+                    if (((int)Fichas.ElementAt(i).Tag) == turno)
                     {
-                        final = f;
-                        Accion = Ac;
-                        Mayor = a;
-                        inicial = i;
+                        a = Maximiza(i, ref f, turno, ref Ac);
+                        if (a > Mayor)
+                        {
+                            final = f;
+                            Accion = Ac;
+                            Mayor = a;
+                            inicial = i;
+                        }
                     }
                 }
-            }
-            Mover(inicial, final, Accion);
-            if (turno == 1)
-                turno = 2;
-            else
-                turno = 1;
+                Mover(inicial, final, Accion);
+                if (turno == 1)
+                    turno = 2;
+                else
+                    turno = 1;
+                Thread.Sleep(100);
+            } while (!Fin(1) && !Fin(2) && !Lleno()) ;
         }
     }
 }
