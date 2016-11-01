@@ -2085,7 +2085,7 @@ namespace Proyecto
 
             IPAddress multicastaddress = IPAddress.Parse("230.0.0.0");
             udpclient.JoinMulticastGroup(multicastaddress);
-            IPEndPoint remoteep = new IPEndPoint(multicastaddress, 5001);
+            IPEndPoint remoteep = new IPEndPoint(IPAddress.Broadcast, 1234);
 
             string strHostName = string.Empty;
             strHostName = Dns.GetHostName();
@@ -2136,14 +2136,13 @@ namespace Proyecto
         {
             UdpClient client = new UdpClient();
 
-            client.ExclusiveAddressUse = false;
-            IPEndPoint localEp = new IPEndPoint(IPAddress.Broadcast, 5001);
+            //client.ExclusiveAddressUse = false;
+            IPEndPoint localEp = new IPEndPoint(IPAddress.Any, 1234);
 
             client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-            client.ExclusiveAddressUse = false;
+            //client.ExclusiveAddressUse = false;
 
-            client.Connect(localEp);
-
+            client.Client.Bind(localEp);
             IPAddress multicastaddress = IPAddress.Parse("230.0.0.0");
             client.JoinMulticastGroup(multicastaddress);
             
@@ -2166,6 +2165,7 @@ namespace Proyecto
                 {
                     comboBox1.Items.Add(s.hostname);
                     servidores.Add(s);
+                    MessageBox.Show("Nombre: " + s.hostname + "\nIp: " + s.ip + "\nPuerto: " + s.puerto);
                 }
                 
             }
