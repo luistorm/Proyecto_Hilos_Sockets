@@ -88,6 +88,10 @@
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.button1 = new System.Windows.Forms.Button();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.radioButton1 = new System.Windows.Forms.RadioButton();
+            this.radioButton2 = new System.Windows.Forms.RadioButton();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox59)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox58)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox57)).BeginInit();
@@ -800,19 +804,61 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(724, 22);
+            this.button1.Location = new System.Drawing.Point(723, 129);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(110, 32);
             this.button1.TabIndex = 59;
-            this.button1.Text = "button1";
+            this.button1.Text = "Crear Partida";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(696, 12);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(191, 20);
+            this.textBox1.TabIndex = 60;
+            // 
+            // radioButton1
+            // 
+            this.radioButton1.AutoSize = true;
+            this.radioButton1.Location = new System.Drawing.Point(739, 79);
+            this.radioButton1.Name = "radioButton1";
+            this.radioButton1.Size = new System.Drawing.Size(57, 17);
+            this.radioButton1.TabIndex = 61;
+            this.radioButton1.TabStop = true;
+            this.radioButton1.Text = "Cliente";
+            this.radioButton1.UseVisualStyleBackColor = true;
+            this.radioButton1.CheckedChanged += new System.EventHandler(this.radioButton1_CheckedChanged);
+            // 
+            // radioButton2
+            // 
+            this.radioButton2.AutoSize = true;
+            this.radioButton2.Location = new System.Drawing.Point(739, 102);
+            this.radioButton2.Name = "radioButton2";
+            this.radioButton2.Size = new System.Drawing.Size(64, 17);
+            this.radioButton2.TabIndex = 62;
+            this.radioButton2.TabStop = true;
+            this.radioButton2.Text = "Servidor";
+            this.radioButton2.UseVisualStyleBackColor = true;
+            // 
+            // comboBox1
+            // 
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Location = new System.Drawing.Point(723, 183);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(121, 21);
+            this.comboBox1.TabIndex = 63;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(955, 513);
+            this.Controls.Add(this.comboBox1);
+            this.Controls.Add(this.radioButton2);
+            this.Controls.Add(this.radioButton1);
+            this.Controls.Add(this.textBox1);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.pictureBox59);
             this.Controls.Add(this.pictureBox58);
@@ -875,6 +921,7 @@
             this.Controls.Add(this.pictureBox1);
             this.Name = "Form1";
             this.Text = "Form1";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox59)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox58)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox57)).EndInit();
@@ -935,6 +982,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -1000,6 +1048,10 @@
         private System.Windows.Forms.PictureBox pictureBox58;
         private System.Windows.Forms.PictureBox pictureBox59;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.RadioButton radioButton1;
+        private System.Windows.Forms.RadioButton radioButton2;
+        private System.Windows.Forms.ComboBox comboBox1;
     }
 }
 

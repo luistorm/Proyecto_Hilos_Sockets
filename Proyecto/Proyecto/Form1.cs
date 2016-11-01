@@ -7,6 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Threading;
+using System.Net;
+using System.Net.Sockets;
+using Newtonsoft.Json;
 
 namespace Proyecto
 {
@@ -17,10 +20,23 @@ namespace Proyecto
         private int[][] Tablero;
         private List<int> Auxiliar;
         private const int Profundidad = 1;
-        private int turno = 1;
+        private List<Servidor> servidores;
+        private bool conectado;
+        private Thread Habla;
+        private Thread Escucha;
         public Form1()
         {
             InitializeComponent();
+
+            servidores = new List<Servidor>();
+
+            Escucha = new Thread(SoyCliente);
+
+            Habla = new Thread(SoyServidor);
+
+            conectado = false;
+
+            CheckForIllegalCrossThreadCalls = false;
 
             Auxiliar = new List<int>();
 
@@ -2063,9 +2079,34 @@ namespace Proyecto
             return true;
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void SoyServidor()
         {
-            do{
+            UdpClient udpclient = new UdpClient();
+
+            IPAddress multicastaddress = IPAddress.Parse("230.0.0.0");
+            udpclient.JoinMulticastGroup(multicastaddress);
+            IPEndPoint remoteep = new IPEndPoint(multicastaddress, 5001);
+
+            string strHostName = string.Empty;
+            strHostName = Dns.GetHostName();
+            IPAddress[] hostIPs = Dns.GetHostAddresses(strHostName);
+
+            Servidor server = new Servidor();
+            server.hostname = textBox1.Text;
+            server.ip = hostIPs[2].ToString();
+            server.puerto = 5000;
+
+            byte[] buffer;
+            buffer = Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(server));
+            
+            while(!conectado)
+            {
+                udpclient.Send(buffer, buffer.Length, remoteep);
+            }
+
+        }
+
+        /*do{
                 int Mayor = -999, final = 0, f = 0, inicial = 0;
                 string Accion = "", Ac = "";
                 int a;
@@ -2089,7 +2130,65 @@ namespace Proyecto
                 else
                     turno = 1;
                 Thread.Sleep(100);
-            } while (!Fin(1) && !Fin(2) && !Lleno()) ;
+            } while (!Fin(1) && !Fin(2) && !Lleno()) ;*/
+
+        private void SoyCliente()
+        {
+            UdpClient client = new UdpClient();
+
+            client.ExclusiveAddressUse = false;
+            IPEndPoint localEp = new IPEndPoint(IPAddress.Broadcast, 5001);
+
+            client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+            client.ExclusiveAddressUse = false;
+
+            client.Connect(localEp);
+
+            IPAddress multicastaddress = IPAddress.Parse("230.0.0.0");
+            client.JoinMulticastGroup(multicastaddress);
+            
+
+            while (!conectado)
+            {
+                Byte[] data = client.Receive(ref localEp);
+                string v = Encoding.ASCII.GetString(data);
+                Servidor s = JsonConvert.DeserializeObject<Servidor>(v);
+                bool b = false;
+                for(int i = 0; i < servidores.Count; i++)
+                {
+                    if (servidores.ElementAt(i).hostname.CompareTo(s.hostname) == 0)
+                    {
+                        b = true;
+                        break;
+                    }
+                }
+                if (!b)
+                {
+                    comboBox1.Items.Add(s.hostname);
+                    servidores.Add(s);
+                }
+                
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (Habla.IsAlive)
+                return;
+            Habla.Start();
+        }
+
+        private void radioButton1_CheckedChanged(object sender, EventArgs e)
+        {
+            if (Escucha.IsAlive)
+                return;
+            Escucha.Start();
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            Escucha.Abort();
+            Habla.Abort();
         }
     }
 }

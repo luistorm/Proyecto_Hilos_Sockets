@@ -6,3 +6,5 @@ C:\Users\Luis\Desktop\Programacion II\II Parcial\Proyecto\Proyecto\Proyecto\obj\
 C:\Users\Luis\Desktop\Programacion II\II Parcial\Proyecto\Proyecto\Proyecto\obj\Debug\Proyecto.csproj.GenerateResource.Cache
 C:\Users\Luis\Desktop\Programacion II\II Parcial\Proyecto\Proyecto\Proyecto\obj\Debug\Proyecto.exe
 C:\Users\Luis\Desktop\Programacion II\II Parcial\Proyecto\Proyecto\Proyecto\obj\Debug\Proyecto.pdb
+C:\Users\Luis\Desktop\Programacion II\II Parcial\Proyecto\Proyecto\Proyecto\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Luis\Desktop\Programacion II\II Parcial\Proyecto\Proyecto\Proyecto\bin\Debug\Newtonsoft.Json.xml
