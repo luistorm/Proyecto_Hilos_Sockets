@@ -24,9 +24,21 @@ namespace Proyecto
         private bool conectado;
         private Thread Habla;
         private Thread Escucha;
+        private string dirGrupo;
+        private Socket Server;
+        private Socket Client;
+        private IPEndPoint EPCliente;
+        private IPEndPoint EPServidor;
+        private Thread EscuchaTCP;
+        private Socket EnviarServidor;
         public Form1()
         {
             InitializeComponent();
+
+            dirGrupo = "230.0.0.0";
+
+            radioButton1.Checked = false;
+            radioButton2.Checked = false;
 
             servidores = new List<Servidor>();
 
@@ -2083,7 +2095,7 @@ namespace Proyecto
         {
             UdpClient udpclient = new UdpClient();
 
-            IPAddress multicastaddress = IPAddress.Parse("230.0.0.0");
+            IPAddress multicastaddress = IPAddress.Parse(dirGrupo);
             udpclient.JoinMulticastGroup(multicastaddress);
             IPEndPoint remoteep = new IPEndPoint(IPAddress.Broadcast, 1234);
 
@@ -2103,7 +2115,7 @@ namespace Proyecto
             {
                 udpclient.Send(buffer, buffer.Length, remoteep);
             }
-
+            udpclient.Close();
         }
 
         /*do{
@@ -2143,7 +2155,8 @@ namespace Proyecto
             //client.ExclusiveAddressUse = false;
 
             client.Client.Bind(localEp);
-            IPAddress multicastaddress = IPAddress.Parse("230.0.0.0");
+            IPAddress multicastaddress = IPAddress.Parse(dirGrupo);
+            timer1.Start();
             client.JoinMulticastGroup(multicastaddress);
             
 
@@ -2171,11 +2184,29 @@ namespace Proyecto
             }
         }
 
+        private void Listen()
+        {
+            string strHostName = string.Empty;
+            strHostName = Dns.GetHostName();
+            IPAddress[] hostIPs = Dns.GetHostAddresses(strHostName);
+            EPServidor = new IPEndPoint(hostIPs[2], 5000);
+            Server = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            Server.Bind(EPServidor);
+            Server.Listen(1);
+            EnviarServidor = Server.Accept();
+            MessageBox.Show("Cliente Conectado con Exito");
+            conectado = true;
+            if (Habla.IsAlive)
+                Habla.Abort();
+        }
+
         private void button1_Click(object sender, EventArgs e)
         {
             if (Habla.IsAlive)
                 return;
             Habla.Start();
+            label2.Show();
+            this.Refresh();
         }
 
         private void radioButton1_CheckedChanged(object sender, EventArgs e)
@@ -2183,12 +2214,60 @@ namespace Proyecto
             if (Escucha.IsAlive)
                 return;
             Escucha.Start();
+            EscuchaTCP = new Thread(Listen);
+            EscuchaTCP.Start();
+            comboBox1.Show();
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             Escucha.Abort();
             Habla.Abort();
+        }
+
+        private void radioButton2_CheckedChanged(object sender, EventArgs e)
+        {
+            button1.Show();
+            textBox1.Show();
+            label3.Show();
+            comboBox1.Hide();
+            if (Escucha.IsAlive)
+                Escucha.Abort();
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            if (dirGrupo.CompareTo("230.0.0.0") == 0)
+                dirGrupo = "230.0.4.20";
+            else
+                dirGrupo = "230.0.0.0";
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (comboBox1.SelectedItem == null)
+            {
+                MessageBox.Show("Debe elegir una partida para unirse");
+                return;
+            }
+            bool b = false;
+            string ip="";
+            int puerto=0;
+            for(int i = 0; i < servidores.Count; i++)
+            {
+                if (servidores.ElementAt(i).hostname.CompareTo(comboBox1.SelectedItem.ToString()) == 0)
+                {
+                    b = true;
+                    ip = servidores.ElementAt(i).ip;
+                    puerto = servidores.ElementAt(i).puerto;
+                    break;
+                }
+            }
+            EPCliente = new IPEndPoint(IPAddress.Parse(ip), puerto);
+            Client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            Client.Connect(EPCliente);
+            if (Escucha.IsAlive)
+                Escucha.Abort();
         }
     }
 }
