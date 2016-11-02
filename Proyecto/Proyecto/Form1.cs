@@ -32,6 +32,7 @@ namespace Proyecto
         private Thread EscuchaTCP;
         private Socket EnviarServidor;
         private Thread ClienteTCP;
+        private Thread JuegaServer;
         public Form1()
         {
             InitializeComponent();
@@ -460,7 +461,7 @@ namespace Proyecto
                 Auxiliar[Tablero[y + 2][x]] = Auxiliar.ElementAt(Nodo);
         }
 
-        private void Mover(int NodoI,int NodoF,string Accion)
+        private void Mover(ref int NodoI,ref int NodoF,ref string Accion,int Player)
         {
             int x = 0, y = 0;
             ObtieneCoordenadas(ref x, ref y, NodoI);
@@ -523,113 +524,227 @@ namespace Proyecto
                 if (x + 2 < 9 && Tablero[y][x + 2] == NodoF
                     && ((int)Fichas.ElementAt(Tablero[y][x + 2]).Tag) == 0)//Puedo saltar hacia der
                     Fichas.ElementAt(Tablero[y][x + 2]).Tag = Fichas.ElementAt(NodoI).Tag;
+                Fichas.ElementAt(NodoI).Tag = 0;
             }
             if (Accion.CompareTo("") == 0)
             {
-                if ((x - 2 >= 0 && y - 2 >= 0) 
+                for(int i = 0; i < Fichas.Count; i++)
+                {
+                    if (((int)Fichas.ElementAt(i).Tag) == Player)
+                    {
+                        NodoI = i;
+                        ObtieneCoordenadas(ref x, ref y, i);
+                        if ((x - 2 >= 0 && y - 2 >= 0) && Tablero[y-2][x-2]!=-1
                     && ((int)Fichas.ElementAt(Tablero[y - 2][x - 2]).Tag) == 0)//Puedo saltar esquina sup izq
-                {
-                    Fichas.ElementAt(Tablero[y - 2][x - 2]).Tag = Fichas.ElementAt(NodoI).Tag;
-                    Fichas.ElementAt(NodoI).Tag = 0;
-                    Multiplicar(Tablero[y - 2][x - 2]);
+                        {
+                            Fichas.ElementAt(Tablero[y - 2][x - 2]).Tag = Player;
+                            Fichas.ElementAt(i).Tag = 0;
+                            Multiplicar(Tablero[y - 2][x - 2]);
+                            Accion = "saltar";
+                            NodoF = Tablero[y - 2][x - 2];
+                            Multiplicar(NodoF);
+                            Pintar();
+                            return;
+                        }
+                        else if ((x + 2 < 9 && y - 2 >= 0) && Tablero[y - 2][x + 2] != -1
+                            && ((int)Fichas.ElementAt(Tablero[y - 2][x + 2]).Tag) == 0)//Puedo saltar esquina sup der
+                        {
+                            Fichas.ElementAt(Tablero[y - 2][x + 2]).Tag = Player;
+                            Fichas.ElementAt(i).Tag = 0;
+                            Multiplicar(Tablero[y - 2][x + 2]);
+                            Accion = "saltar";
+                            NodoF = Tablero[y - 2][x + 2];
+                            Multiplicar(NodoF);
+                            Pintar();
+                            return;
+                        }
+                        else if ((x - 2 >= 0 && y + 2 < 17) && Tablero[y + 2][x - 2] != -1
+                            && ((int)Fichas.ElementAt(Tablero[y + 2][x - 2]).Tag) == 0)//Puedo saltar esquina inf izq
+                        {
+                            Fichas.ElementAt(Tablero[y + 2][x - 2]).Tag = Player;
+                            Fichas.ElementAt(i).Tag = 0;
+                            Multiplicar(Tablero[y + 2][x - 2]);
+                            Accion = "saltar";
+                            NodoF = Tablero[y + 2][x - 2];
+                            Multiplicar(NodoF);
+                            Pintar();
+                            return;
+                        }
+                        else if ((x + 2 < 9 && y + 2 < 17) && Tablero[y + 2][x + 2] != -1
+                            && ((int)Fichas.ElementAt(Tablero[y + 2][x + 2]).Tag) == 0)//Puedo saltar esquina inf izq
+                        {
+                            Fichas.ElementAt(Tablero[y + 2][x + 2]).Tag = Player;
+                            Fichas.ElementAt(i).Tag = 0;
+                            Multiplicar(Tablero[y + 2][x + 2]);
+                            Accion = "saltar";
+                            NodoF = Tablero[y + 2][x + 2];
+                            Multiplicar(NodoF);
+                            Pintar();
+                            return;
+                        }
+                        else if ((x - 1 >= 0 && y - 2 >= 0) && Tablero[y - 2][x - 1] != -1
+                            && ((int)Fichas.ElementAt(Tablero[y - 2][x - 1]).Tag) == 0)//Puedo saltar esquina sup izq rara
+                        {
+                            Fichas.ElementAt(Tablero[y - 2][x - 1]).Tag = Player;
+                            Fichas.ElementAt(i).Tag = 0;
+                            Multiplicar(Tablero[y - 2][x - 1]);
+                            Accion = "saltar";
+                            NodoF = Tablero[y - 2][x - 1];
+                            Multiplicar(NodoF);
+                            Pintar();
+                            return;
+                        }
+                        else if ((x + 1 < 9 && y - 2 >= 0) && Tablero[y - 2][x + 1] != -1
+                            && ((int)Fichas.ElementAt(Tablero[y - 2][x + 1]).Tag) == 0)//Puedo saltar esquina sup der rara
+                        {
+                            Fichas.ElementAt(Tablero[y - 2][x + 1]).Tag = Player;
+                            Fichas.ElementAt(i).Tag = 0;
+                            Multiplicar(Tablero[y - 2][x + 1]);
+                            Accion = "saltar";
+                            NodoF = Tablero[y - 2][x + 1];
+                            Multiplicar(NodoF);
+                            Pintar();
+                            return;
+                        }
+                        else if ((x - 1 >= 0 && y + 2 < 17) && Tablero[y + 2][x - 1] != -1
+                            && ((int)Fichas.ElementAt(Tablero[y + 2][x - 1]).Tag) == 0)//Puedo saltar esquina inf izq rara
+                        {
+                            Fichas.ElementAt(Tablero[y + 2][x - 1]).Tag = Player;
+                            Fichas.ElementAt(i).Tag = 0;
+                            Multiplicar(Tablero[y + 2][x - 1]);
+                            Accion = "saltar";
+                            NodoF = Tablero[y + 2][x - 1];
+                            Multiplicar(NodoF);
+                            Pintar();
+                            return;
+                        }
+                        else if ((x + 1 < 9 && y + 2 < 17) && Tablero[y + 2][x + 1] != -1
+                            && ((int)Fichas.ElementAt(Tablero[y + 2][x + 1]).Tag) == 0)//Puedo saltar esquina inf der rara
+                        {
+                            Fichas.ElementAt(Tablero[y + 2][x + 1]).Tag = Player;
+                            Fichas.ElementAt(i).Tag = 0;
+                            Multiplicar(Tablero[y + 2][x + 1]);
+                            Accion = "saltar";
+                            NodoF = Tablero[y + 2][x + 1];
+                            Multiplicar(NodoF);
+                            Pintar();
+                            return;
+                        }
+                        else if (y - 4 >= 0 && Tablero[y - 4][x] != -1
+                            && ((int)Fichas.ElementAt(Tablero[y - 4][x]).Tag) == 0)//Puedo saltar hacia arriba doble
+                        {
+                            Fichas.ElementAt(Tablero[y - 4][x]).Tag = Player;
+                            Fichas.ElementAt(i).Tag = 0;
+                            Multiplicar(Tablero[y - 4][x]);
+                            Accion = "saltar";
+                            NodoF = Tablero[y - 4][x];
+                            Multiplicar(NodoF);
+                            Pintar();
+                            return;
+                        }
+                        else if (y + 4 < 17 && Tablero[y + 4][x] != -1
+                            && ((int)Fichas.ElementAt(Tablero[y + 4][x]).Tag) == 0)//Puedo saltar hacia abajo doble
+                        {
+                            Fichas.ElementAt(Tablero[y + 4][x]).Tag = Player;
+                            Fichas.ElementAt(i).Tag = 0;
+                            Multiplicar(Tablero[y + 4][x]);
+                            Accion = "saltar";
+                            NodoF = Tablero[y - 4][x];
+                            Multiplicar(NodoF);
+                            Pintar();
+                            return;
+                        }
+                        else if (x - 2 >= 0 && Tablero[y][x - 2] != -1
+                            && ((int)Fichas.ElementAt(Tablero[y][x - 2]).Tag) == 0)//Puedo saltar hacia izq
+                        {
+                            Fichas.ElementAt(Tablero[y][x - 2]).Tag = Player;
+                            Fichas.ElementAt(i).Tag = 0;
+                            Multiplicar(Tablero[y][x - 2]);
+                            Accion = "saltar";
+                            NodoF = Tablero[y][x - 2];
+                            Multiplicar(NodoF);
+                            Pintar();
+                            return;
+                        }
+                        else if (x + 2 < 9 && Tablero[y][x + 2] != -1
+                            && ((int)Fichas.ElementAt(Tablero[y][x + 2]).Tag) == 0)//Puedo saltar hacia der
+                        {
+                            Fichas.ElementAt(Tablero[y][x + 2]).Tag = Player;
+                            Fichas.ElementAt(i).Tag = 0;
+                            Multiplicar(Tablero[y][x + 2]);
+                            Accion = "saltar";
+                            NodoF = Tablero[y][x + 2];
+                            Multiplicar(NodoF);
+                            Pintar();
+                            return;
+                        }
+                        else if ((x - 1 >= 0 && y - 1 >= 0) && Tablero[y - 1][x - 1] != -1
+                            && ((int)Fichas.ElementAt(Tablero[y - 1][x - 1]).Tag) == 0)//Puedo clonar esquina sup izq
+                        {
+                            Fichas.ElementAt(Tablero[y - 1][x - 1]).Tag = Player;
+                            Accion = "saltar";
+                            NodoF = Tablero[y - 1][x - 1];
+                            Multiplicar(NodoF);
+                            Pintar();
+                            return;
+                        }
+
+                        else if ((x + 1 < 9 && y - 1 >= 0) && Tablero[y - 1][x + 1] != -1
+                            && ((int)Fichas.ElementAt(Tablero[y - 1][x + 1]).Tag) == 0)//Puedo clonar esquina sup der
+                        {
+                            Fichas.ElementAt(Tablero[y - 1][x + 1]).Tag = Player;
+                            Accion = "clonar";
+                            NodoF = Tablero[y - 1][x + 1];
+                            Multiplicar(NodoF);
+                            Pintar();
+                            return;
+                        }
+
+                        else if ((x - 1 >= 0 && y + 1 < 17) && Tablero[y + 1][x - 1] != -1
+                            && ((int)Fichas.ElementAt(Tablero[y + 1][x - 1]).Tag) == 0)//Puedo clonar esquina inf izq
+                        {
+                            Fichas.ElementAt(Tablero[y + 1][x - 1]).Tag = Player;
+                            Accion = "clonar";
+                            NodoF = Tablero[y + 1][x - 1];
+                            Multiplicar(NodoF);
+                            Pintar();
+                            return;
+                        }
+
+                        else if ((x + 1 < 9 && y + 1 < 17) && Tablero[y + 1][x + 1] != -1
+                            && ((int)Fichas.ElementAt(Tablero[y + 1][x + 1]).Tag) == 0)//Puedo clonar esquina inf izq
+                        {
+                            Fichas.ElementAt(Tablero[y + 1][x + 1]).Tag = Player;
+                            Accion = "clonar";
+                            NodoF = Tablero[y + 1][x + 1];
+                            Multiplicar(NodoF);
+                            Pintar();
+                            return;
+                        }
+
+                        else if (y - 2 >= 0 && Tablero[y - 2][x] != -1
+                            && ((int)Fichas.ElementAt(Tablero[y - 2][x]).Tag) == 0)//Puedo clonar hacia arriba
+                        {
+                            Fichas.ElementAt(Tablero[y - 2][x]).Tag = Player;
+                            Accion = "clonar";
+                            NodoF = Tablero[y - 2][x];
+                            Multiplicar(NodoF);
+                            Pintar();
+                            return;
+                        }
+
+                        else if (y + 2 < 17 && Tablero[y + 2][x] != -1
+                            && ((int)Fichas.ElementAt(Tablero[y + 2][x]).Tag) == 0)//Puedo clonar hacia arriba
+                        {
+                            Fichas.ElementAt(Tablero[y + 2][x]).Tag = Player;
+                            Accion = "clonar";
+                            NodoF = Tablero[y + 2][x];
+                            Multiplicar(NodoF);
+                            Pintar();
+                            return;
+                        }
+                    }
                 }
-                else if ((x + 2 < 9 && y - 2 >= 0) 
-                    && ((int)Fichas.ElementAt(Tablero[y - 2][x + 2]).Tag) == 0)//Puedo saltar esquina sup der
-                {
-                    Fichas.ElementAt(Tablero[y - 2][x + 2]).Tag = Fichas.ElementAt(NodoI).Tag;
-                    Fichas.ElementAt(NodoI).Tag = 0;
-                    Multiplicar(Tablero[y - 2][x + 2]);
-                }
-                else if ((x - 2 >= 0 && y + 2 < 17)
-                    && ((int)Fichas.ElementAt(Tablero[y + 2][x - 2]).Tag) == 0)//Puedo saltar esquina inf izq
-                {
-                    Fichas.ElementAt(Tablero[y + 2][x - 2]).Tag = Fichas.ElementAt(NodoI).Tag;
-                    Fichas.ElementAt(NodoI).Tag = 0;
-                    Multiplicar(Tablero[y + 2][x - 2]);
-                }
-                else if ((x + 2 < 9 && y + 2 < 17) 
-                    && ((int)Fichas.ElementAt(Tablero[y + 2][x + 2]).Tag) == 0)//Puedo saltar esquina inf izq
-                {
-                    Fichas.ElementAt(Tablero[y + 2][x + 2]).Tag = Fichas.ElementAt(NodoI).Tag;
-                    Fichas.ElementAt(NodoI).Tag = 0;
-                    Multiplicar(Tablero[y + 2][x + 2]);
-                }      
-                else if ((x - 1 >= 0 && y - 2 >= 0) 
-                    && ((int)Fichas.ElementAt(Tablero[y - 2][x - 1]).Tag) == 0)//Puedo saltar esquina sup izq rara
-                {
-                    Fichas.ElementAt(Tablero[y - 2][x - 1]).Tag = Fichas.ElementAt(NodoI).Tag;
-                    Fichas.ElementAt(NodoI).Tag = 0;
-                    Multiplicar(Tablero[y - 2][x - 1]);
-                }
-                else if ((x + 1 < 9 && y - 2 >= 0) 
-                    && ((int)Fichas.ElementAt(Tablero[y - 2][x + 1]).Tag) == 0)//Puedo saltar esquina sup der rara
-                {
-                    Fichas.ElementAt(Tablero[y - 2][x + 1]).Tag = Fichas.ElementAt(NodoI).Tag;
-                    Fichas.ElementAt(NodoI).Tag = 0;
-                    Multiplicar(Tablero[y - 2][x + 1]);
-                }    
-                else if ((x - 1 >= 0 && y + 2 < 17) 
-                    && ((int)Fichas.ElementAt(Tablero[y + 2][x - 1]).Tag) == 0)//Puedo saltar esquina inf izq rara
-                {
-                    Fichas.ElementAt(Tablero[y + 2][x - 1]).Tag = Fichas.ElementAt(NodoI).Tag;
-                    Fichas.ElementAt(NodoI).Tag = 0;
-                    Multiplicar(Tablero[y + 2][x - 1]);
-                }                    
-                else if ((x + 1 < 9 && y + 2 < 17) 
-                    && ((int)Fichas.ElementAt(Tablero[y + 2][x + 1]).Tag) == 0)//Puedo saltar esquina inf der rara
-                {
-                    Fichas.ElementAt(Tablero[y + 2][x + 1]).Tag = Fichas.ElementAt(NodoI).Tag;
-                    Fichas.ElementAt(NodoI).Tag = 0;
-                    Multiplicar(Tablero[y + 2][x + 1]);
-                }                    
-                else if (y - 4 >= 0 
-                    && ((int)Fichas.ElementAt(Tablero[y - 4][x]).Tag) == 0)//Puedo saltar hacia arriba doble
-                {
-                    Fichas.ElementAt(Tablero[y - 4][x]).Tag = Fichas.ElementAt(NodoI).Tag;
-                    Fichas.ElementAt(NodoI).Tag = 0;
-                    Multiplicar(Tablero[y - 4][x]);
-                }
-                else if (y + 4 < 17 
-                    && ((int)Fichas.ElementAt(Tablero[y + 4][x]).Tag) == 0)//Puedo saltar hacia abajo doble
-                {
-                    Fichas.ElementAt(Tablero[y + 4][x]).Tag = Fichas.ElementAt(NodoI).Tag;
-                    Fichas.ElementAt(NodoI).Tag = 0;
-                    Multiplicar(Tablero[y + 4][x]);
-                }    
-                else if (x - 2 >= 0 
-                    && ((int)Fichas.ElementAt(Tablero[y][x - 2]).Tag) == 0)//Puedo saltar hacia izq
-                {
-                    Fichas.ElementAt(Tablero[y][x - 2]).Tag = Fichas.ElementAt(NodoI).Tag;
-                    Fichas.ElementAt(NodoI).Tag = 0;
-                    Multiplicar(Tablero[y][x - 2]);
-                }
-                else if (x + 2 < 9 
-                    && ((int)Fichas.ElementAt(Tablero[y][x + 2]).Tag) == 0)//Puedo saltar hacia der
-                {
-                    Fichas.ElementAt(Tablero[y][x + 2]).Tag = Fichas.ElementAt(NodoI).Tag;
-                    Fichas.ElementAt(NodoI).Tag = 0;
-                    Multiplicar(Tablero[y][x + 2]);
-                }    
-                else if ((x - 1 >= 0 && y - 1 >= 0) 
-                    && ((int)Fichas.ElementAt(Tablero[y - 1][x - 1]).Tag) == 0)//Puedo clonar esquina sup izq
-                    Fichas.ElementAt(Tablero[y - 1][x - 1]).Tag = Fichas.ElementAt(NodoI).Tag;
-                else if ((x + 1 < 9 && y - 1 >= 0) 
-                    && ((int)Fichas.ElementAt(Tablero[y - 1][x + 1]).Tag) == 0)//Puedo clonar esquina sup der
-                    Fichas.ElementAt(Tablero[y - 1][x + 1]).Tag = Fichas.ElementAt(NodoI).Tag;
-                else if ((x - 1 >= 0 && y + 1 < 17) 
-                    && ((int)Fichas.ElementAt(Tablero[y + 1][x - 1]).Tag) == 0)//Puedo clonar esquina inf izq
-                    Fichas.ElementAt(Tablero[y + 1][x - 1]).Tag = Fichas.ElementAt(NodoI).Tag;
-                else if ((x + 1 < 9 && y + 1 < 17) && Tablero[y + 1][x + 1] == NodoF
-                    && ((int)Fichas.ElementAt(Tablero[y + 1][x + 1]).Tag) == 0)//Puedo clonar esquina inf izq
-                    Fichas.ElementAt(Tablero[y + 1][x + 1]).Tag = Fichas.ElementAt(NodoI).Tag;
-                else if (y - 2 >= 0 
-                    && ((int)Fichas.ElementAt(Tablero[y - 2][x]).Tag) == 0)//Puedo clonar hacia arriba
-                    Fichas.ElementAt(Tablero[y - 2][x]).Tag = Fichas.ElementAt(NodoI).Tag;
-                else if (y + 2 < 17 
-                    && ((int)Fichas.ElementAt(Tablero[y + 2][x]).Tag) == 0)//Puedo clonar hacia arriba
-                    Fichas.ElementAt(Tablero[y + 2][x]).Tag = Fichas.ElementAt(NodoI).Tag;
-                Pintar();
-                return;
             }
             Multiplicar(NodoF);
             Pintar();
@@ -2092,6 +2207,76 @@ namespace Proyecto
             return true;
         }
 
+        private string Ganador()
+        {
+            int c = 0, c2 = 0;
+            for(int i = 0; i < Fichas.Count; i++)
+            {
+                if (((int)Fichas.ElementAt(i).Tag) == 1)
+                {
+                    c++;
+                }
+                if (((int)Fichas.ElementAt(i).Tag) == 2)
+                {
+                    c2++;
+                }
+            }
+            if (c > c2)
+                return "Gana Servidor";
+            if (c2 < c)
+                return "Gana Cliente";
+            else
+                return "Empate";
+        }
+
+        private void JugarServer()
+        {
+            while (!Fin(1) && !Fin(2) && !Lleno())
+            {
+                byte[] buff = new byte[1024];
+                EnviarServidor.Receive(buff);
+                if (buff != null)
+                {
+                    Movimiento m = JsonConvert.DeserializeObject<Movimiento>(Encoding.ASCII.GetString(buff));
+                    string s = "";
+                    s = m.tipo;
+                    int ini = 0, fin = 0;
+                    ini = m.nodos[0];
+                    fin = m.nodos[1];
+                    Mover(ref ini, ref fin,ref s,2);
+                    if (Fin(1) || Fin(2) || Lleno())
+                        break;
+                    int Mayor = -999, final = 0, f = 0, inicial = 0;
+                    string Accion = "", Ac = "";
+                    int a;
+                    for (int i = 0; i < Fichas.Count; i++)
+                    {
+                        if (((int)Fichas.ElementAt(i).Tag) == 1) // Debo maximizar al servidor
+                        {
+                            a = Maximiza(i, ref f, 1, ref Ac);
+                            if (a > Mayor)
+                            {
+                                Mayor = a;
+                                Accion = Ac;
+                                final = f;
+                                inicial = i;
+                            }
+                        }
+                    }
+                    Mover(ref inicial,ref final,ref Accion,1);
+                    m = new Movimiento();
+                    m.tipo = Accion;
+                    m.nodos = new int[2];
+                    m.nodos[0] = inicial;
+                    m.nodos[1] = final;
+                    buff = Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(m).ToString());
+                    EnviarServidor.Send(buff);
+                }
+                
+            }
+            MessageBox.Show("Fin de partida "+Ganador());
+        }
+
         private void SoyServidor()
         {
             UdpClient udpclient = new UdpClient();
@@ -2119,31 +2304,7 @@ namespace Proyecto
             udpclient.Close();
         }
 
-        /*do{
-                int Mayor = -999, final = 0, f = 0, inicial = 0;
-                string Accion = "", Ac = "";
-                int a;
-                for (int i = 0; i < Fichas.Count; i++)
-                {
-                    if (((int)Fichas.ElementAt(i).Tag) == turno)
-                    {
-                        a = Maximiza(i, ref f, turno, ref Ac);
-                        if (a > Mayor)
-                        {
-                            final = f;
-                            Accion = Ac;
-                            Mayor = a;
-                            inicial = i;
-                        }
-                    }
-                }
-                Mover(inicial, final, Accion);
-                if (turno == 1)
-                    turno = 2;
-                else
-                    turno = 1;
-                Thread.Sleep(100);
-            } while (!Fin(1) && !Fin(2) && !Lleno()) ;*/
+        
 
         private void SoyCliente()
         {
@@ -2186,16 +2347,48 @@ namespace Proyecto
 
         private void ListenCliente()
         {
-            while (true)
+            while (!Fin(1) && !Fin(2) && !Lleno())
             {
                 byte[] buff = new byte[1024];
                 Client.Receive(buff);
                 if (buff != null)//Si realmente recibo algo
                 {
                     Movimiento m = JsonConvert.DeserializeObject<Movimiento>(Encoding.ASCII.GetString(buff));
-                    Mover(m.nodos[0], m.nodos[1], m.tipo);
+                    string s = "";
+                    s = m.tipo;
+                    int ini = 0, fin = 0;
+                    ini = m.nodos[0];
+                    fin = m.nodos[1];
+                    Mover(ref ini, ref fin, ref s,1);
+                    if (Fin(1) || Fin(2) || Lleno())
+                        break;
+                    int Mayor = -999, final = 0, f = 0, inicial = 0;
+                    string Accion = "", Ac = "";
+                    int a;
+                    for (int i = 0; i < Fichas.Count; i++)
+                    {
+                        if (((int)Fichas.ElementAt(i).Tag) == 2) // Debo maximizar al servidor
+                        {
+                            a = Maximiza(i, ref f, 2, ref Ac);
+                            if (a > Mayor)
+                            {
+                                Mayor = a;
+                                Accion = Ac;
+                                final = f;
+                                inicial = i;
+                            }
+                        }
+                    }
+                    Mover(ref inicial,ref final,ref Accion,2);
+                    m.tipo = Accion;
+                    m.nodos = new int[2];
+                    m.nodos[0] = inicial;
+                    m.nodos[1] = final;
+                    buff = Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(m).ToString());
+                    Client.Send(buff);
                 }
             }
+            MessageBox.Show("Fin de partida " + Ganador());
         }
 
         private void Listen()
@@ -2229,7 +2422,7 @@ namespace Proyecto
                     }
                 }
             }
-            Mover(inicial, final, Accion);
+            Mover(ref inicial,ref final,ref Accion,1);
             Movimiento m = new Movimiento();
             m.tipo = Accion;
             m.nodos = new int[2];
@@ -2237,6 +2430,8 @@ namespace Proyecto
             m.nodos[1] = final;
             byte[] buff = Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(m).ToString());
             EnviarServidor.Send(buff);
+            JuegaServer = new Thread(JugarServer);
+            JuegaServer.Start();
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -2268,6 +2463,8 @@ namespace Proyecto
                 EscuchaTCP.Abort();
             if (ClienteTCP != null && ClienteTCP.IsAlive)
                 ClienteTCP.Abort();
+            if (JuegaServer != null && JuegaServer.IsAlive)
+                JuegaServer.Abort();
         }
 
         private void radioButton2_CheckedChanged(object sender, EventArgs e)
