@@ -2178,10 +2178,14 @@ namespace Proyecto
                 {
                     comboBox1.Items.Add(s.hostname);
                     servidores.Add(s);
-                    MessageBox.Show("Nombre: " + s.hostname + "\nIp: " + s.ip + "\nPuerto: " + s.puerto);
                 }
                 
             }
+        }
+
+        private void ListenCliente()
+        {
+
         }
 
         private void Listen()
@@ -2217,12 +2221,15 @@ namespace Proyecto
             EscuchaTCP = new Thread(Listen);
             EscuchaTCP.Start();
             comboBox1.Show();
+            button2.Show();
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             Escucha.Abort();
             Habla.Abort();
+            if(EscuchaTCP != null && EscuchaTCP.IsAlive)
+                EscuchaTCP.Abort();
         }
 
         private void radioButton2_CheckedChanged(object sender, EventArgs e)
@@ -2250,14 +2257,12 @@ namespace Proyecto
                 MessageBox.Show("Debe elegir una partida para unirse");
                 return;
             }
-            bool b = false;
             string ip="";
             int puerto=0;
             for(int i = 0; i < servidores.Count; i++)
             {
                 if (servidores.ElementAt(i).hostname.CompareTo(comboBox1.SelectedItem.ToString()) == 0)
                 {
-                    b = true;
                     ip = servidores.ElementAt(i).ip;
                     puerto = servidores.ElementAt(i).puerto;
                     break;
@@ -2266,6 +2271,7 @@ namespace Proyecto
             EPCliente = new IPEndPoint(IPAddress.Parse(ip), puerto);
             Client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             Client.Connect(EPCliente);
+            conectado = true;
             if (Escucha.IsAlive)
                 Escucha.Abort();
         }
