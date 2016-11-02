@@ -31,6 +31,7 @@ namespace Proyecto
         private IPEndPoint EPServidor;
         private Thread EscuchaTCP;
         private Socket EnviarServidor;
+        private Thread ClienteTCP;
         public Form1()
         {
             InitializeComponent();
@@ -2185,7 +2186,16 @@ namespace Proyecto
 
         private void ListenCliente()
         {
-
+            while (true)
+            {
+                byte[] buff = new byte[1024];
+                Client.Receive(buff);
+                if (buff != null)//Si realmente recibo algo
+                {
+                    Movimiento m = JsonConvert.DeserializeObject<Movimiento>(Encoding.ASCII.GetString(buff));
+                    Mover(m.nodos[0], m.nodos[1], m.tipo);
+                }
+            }
         }
 
         private void Listen()
@@ -2202,6 +2212,31 @@ namespace Proyecto
             conectado = true;
             if (Habla.IsAlive)
                 Habla.Abort();
+            int Mayor = -999, final = 0, f = 0, inicial = 0;
+            string Accion = "", Ac = "";
+            int a;
+            for (int i = 0; i < Fichas.Count; i++)
+            {
+                if (((int)Fichas.ElementAt(i).Tag) == 1) // Debo maximizar al servidor
+                {
+                    a = Maximiza(i, ref f, 1, ref Ac);
+                    if (a > Mayor)
+                    {
+                        Mayor = a;
+                        Accion = Ac;
+                        final = f;
+                        inicial = i;
+                    }
+                }
+            }
+            Mover(inicial, final, Accion);
+            Movimiento m = new Movimiento();
+            m.tipo = Accion;
+            m.nodos = new int[2];
+            m.nodos[0] = inicial;
+            m.nodos[1] = final;
+            byte[] buff = Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(m).ToString());
+            EnviarServidor.Send(buff);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -2209,6 +2244,8 @@ namespace Proyecto
             if (Habla.IsAlive)
                 return;
             Habla.Start();
+            EscuchaTCP = new Thread(Listen);
+            EscuchaTCP.Start();
             label2.Show();
             this.Refresh();
         }
@@ -2218,8 +2255,7 @@ namespace Proyecto
             if (Escucha.IsAlive)
                 return;
             Escucha.Start();
-            EscuchaTCP = new Thread(Listen);
-            EscuchaTCP.Start();
+            
             comboBox1.Show();
             button2.Show();
         }
@@ -2230,6 +2266,8 @@ namespace Proyecto
             Habla.Abort();
             if(EscuchaTCP != null && EscuchaTCP.IsAlive)
                 EscuchaTCP.Abort();
+            if (ClienteTCP != null && ClienteTCP.IsAlive)
+                ClienteTCP.Abort();
         }
 
         private void radioButton2_CheckedChanged(object sender, EventArgs e)
@@ -2240,6 +2278,7 @@ namespace Proyecto
             comboBox1.Hide();
             if (Escucha.IsAlive)
                 Escucha.Abort();
+            
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -2274,6 +2313,8 @@ namespace Proyecto
             conectado = true;
             if (Escucha.IsAlive)
                 Escucha.Abort();
+            ClienteTCP = new Thread(ListenCliente);
+            ClienteTCP.Start();
         }
     }
 }
